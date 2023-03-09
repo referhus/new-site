@@ -1,0 +1,96 @@
+(function (app) {
+  "use strict";
+
+  var Social = function () {};
+
+  Social.prototype.init = function () {
+    var _self = this;
+    _self.setSocialUrl();
+    _self.mobileBehaviour();
+  };
+
+  Social.prototype.setSocialUrl = function () {
+    // $('.social-item').on('click', function(e) {
+
+    //     var section = $('.section.section-active').index();
+
+    //     var linkedinLink = 'https://www.linkedin.com/shareArticle?mini=true&url=' + config.siteUrl + '%3Fa%3D' + section + '&title=&summary=&source=';
+    //     var twitterLink = 'https://twitter.com/home?status=' + config.siteUrl + '?a=' + section;
+    //     var fbLink = 'https://www.facebook.com/sharer/sharer.php?u=' + config.siteUrl + '?a=' + section;
+    //     var fbLink = 'https://www.facebook.com/sharer/sharer.php?u=' + config.siteUrl + '?a=' + section;
+    //     var gplusLink = 'https://plus.google.com/share?url=' + config.siteUrl + '?a=' + section;
+    //     var emailLink = 'mailto:?&body=' + config.siteUrl + '?a=' + section;
+    //     $('.social-linkedin').attr('href', linkedinLink);
+    //     $('.social-twitter').attr('href', twitterLink);
+    //     $('.social-facebook').attr('href', fbLink);
+    //     $('.social-googleplus').attr('href', gplusLink);
+    //     $('.social-mail').attr('href', emailLink);
+
+    // })
+
+    $(".social-item").on("click", function (e) {
+      // var section = $('.section.section-active').index();
+
+      var linkedinLink =
+        "https://www.linkedin.com/shareArticle?mini=true&url=" + config.siteUrl;
+      var twitterLink =
+        "https://twitter.com/share?text=Safe Cities Index 2021&url=http://" +
+        config.siteUrl;
+      var fbLink =
+        "https://www.facebook.com/sharer/sharer.php?u=" + config.siteUrl;
+      var fbLink =
+        "https://www.facebook.com/sharer/sharer.php?u=" + config.siteUrl;
+      var gplusLink = "https://plus.google.com/share?url=" + config.siteUrl;
+      var emailLink = "mailto:?&body=" + config.siteUrl;
+      $(".social-linkedin").attr("href", linkedinLink);
+      $(".social-twitter").attr("href", twitterLink);
+      $(".social-facebook").attr("href", fbLink);
+      $(".social-googleplus").attr("href", gplusLink);
+      $(".social-mail").attr("href", emailLink);
+    });
+  };
+  Social.prototype.getSocialUrl = function () {
+    let index = new URLSearchParams(window.location.search).get("a");
+
+    app.Navigation.prototype.navigateLayerTo(index);
+  };
+
+  Social.prototype.mobileBehaviour = function () {
+    $(".btn__open-social").on("click", function (e) {
+      e.preventDefault();
+      $(".container__social").addClass("mobile-active");
+      TweenMax.to($(".container__social"), 0.3, {
+        width: "246px",
+        ease: Expo.easeOut,
+      });
+      TweenMax.staggerTo(
+        $(".btn__social"),
+        0.3,
+        { delay: 0.3, opacity: 1, ease: Expo.easeOut },
+        0.05
+      );
+    });
+
+    $(".btn__close-social").on("click", function (e) {
+      e.preventDefault();
+      $(".container__social").removeClass("mobile-active");
+
+      var arr = $(".btn__social").toArray().reverse();
+      TweenMax.staggerTo(
+        arr,
+        0.3,
+        { delay: 0.3, opacity: 0, ease: Expo.easeOut },
+        0.05
+      );
+      TweenMax.to($(".container__social"), 0.3, {
+        width: "48px",
+        ease: Expo.easeOut,
+      });
+    });
+  };
+  app.Social = Social;
+
+  app.ready(function () {
+    Social.prototype.init();
+  });
+})(window.app);

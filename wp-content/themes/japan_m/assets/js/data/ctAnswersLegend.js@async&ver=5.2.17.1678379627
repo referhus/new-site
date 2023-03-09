@@ -1,0 +1,78 @@
+const ctLegend = {
+  en: {
+    q1: {
+      0: "The city does not have a smart city plan as of now nor plans for the next five years",
+      1: "The city has a smart city plan or plans to invest in the next 5 years",
+      2: "The city has a smart city plan and explicitly focuses on cybersecurity of the smart city infrastructure",
+    },
+    q6: {
+      0: "Highly unadaptive (There is no formal plan)",
+      1: "Weak adaptive capacity (There is no formal plan, but the governance, roles and responsibilities in the event of a disaster have been mapped out)",
+      2: "Somewhat adaptive (There is a formal plan with the governance, roles and responsibilities in the event of a disaster mapped out but it is more than 5 years old and has not been reviewed in the last 5 years)",
+      3: "Generally adaptive (There is a formal plan completed or reviewed within the last 5 years, with clear governance, roles and responsibilities)",
+      4: "Strong adaptive capacities (There is a formal plan completed or reviewed within the last 5 years, with clear governance, roles and responsibilities and mandatory review is carried out regularly)",
+    },
+    q7: {
+      0: "No, disaster risk has not been accounted for in state/city-level urban planning",
+      1: "Yes, disaster risk has been accounted for in state/city-level urban planning, but there is little evidence of compliance",
+      2: "Yes, disaster risk has been accounted for in state/city-level urban planning, and compliance is high",
+    },
+    q9: {
+      0: "Intolerable",
+      1: "Undesirable",
+      2: "Uncomfortable",
+      3: "Tolerable",
+      4: "Acceptable",
+    },
+    q10: {
+      0: "No, is not included in the masterplan",
+      1: "Yes, it is talked about in the masterplan but not in significant detail ",
+      2: "Yes, it is included in the masterplan and includes very clear goals and a strategy to achieve these outcomes",
+    },
+    q11: {
+      0: "Intolerable",
+      1: "Tolerable",
+      2: "Acceptable",
+      3: "Good",
+      4: "Best",
+    },
+  },
+  jp: {
+    q1: {
+      0: "現時点でスマートシティ計画がなく、今後5年間も計画がない都市",
+      1: "スマートシティ計画がある、あるいは今後5年間に投資を予定している都市",
+      2: "スマートシティ計画があり、スマートシティのインフラとしてサイバーセキュリティに明確に焦点を当てている",
+    },
+    q6: {
+      0: "適応能力が低い（正式な計画がない）",
+      1: "適応能力が弱い（正式な計画はないが、災害時のガバナンス、役割、責任が明確にされている。）",
+      2: "やや適応能力がある（災害時のガバナンス、役割、責任を明確にした正式な計画はあるが、5年以上前のもので、過去5年間に見直しされていない。）",
+      3: "おおむね適応能力がある（災害時のガバナンス、役割、責任を明確にした正式な計画が5年以内に完成した、あるいは見直しが行われた。",
+      4: "強い適応能力 (災害時のガバナンス、役割、責任を明確にした正式な計画が過去5年以内に完成または見直が行われ、しかも見直しが定期的に行われている)",
+    },
+    q7: {
+      0: "いいえ、災害リスクは州・市レベルの都市計画に考慮されていない",
+      1: " はい、災害リスクは州・都市レベルの都市計画に考慮されているが、遵守の度合いは低い",
+      2: " はい、災害リスクは州・都市レベルの都市計画に考慮されており、遵守の度合いも高い",
+    },
+    q9: {
+      0: "耐えられない",
+      1: "好ましくない",
+      2: "不愉快",
+      3: "耐えられる",
+      4: "容認できる ",
+    },
+    q10: {
+      0: "いいえ、マスタープランに示されていない。",
+      1: " はい、マスタープランで協議されたことはあるが、具体的に示されていない。",
+      2: "はい、マスタープランには、成果を達成するために明確なゴールや戦略が示されている。",
+    },
+    q11: {
+      0: "耐えられない",
+      1: " 耐えられる",
+      2: " 容認できる",
+      3: "良い",
+      4: "最良",
+    },
+  },
+};

@@ -1,0 +1,32 @@
+(function (app) {
+    'use strict';
+
+    var Preload = function () { };
+
+    Preload.prototype.init = function () {
+        var _self = this;
+        Preload.prototype.assets();
+    };
+
+
+    Preload.prototype.assets = function () {
+        $.each($('.asset-src'), function (index, value) {
+            var el = $(value),
+                src = el.attr('asset-src');
+            el.attr('src', src);
+        })
+    }
+
+
+    app.Preload = Preload;
+
+    app.ready(function () {
+
+    })
+
+    app.onLoad(function () {
+        Preload.prototype.init()
+
+    })
+
+})(window.app);

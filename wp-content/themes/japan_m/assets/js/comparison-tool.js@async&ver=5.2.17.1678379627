@@ -1,0 +1,1703 @@
+$(document).ready(function () {
+  var ctField = $(".ct-form-field");
+  var ctBtn = $(".ct-btn");
+  var ctBack = $(".ct-back");
+  var ctSelection = $(".ct-selection");
+  const ctInfoBackButton = $(".ct-close-ct");
+  const termsCheckbox = $(".ct-field-terms");
+  const closeButton = $(".ct-close-button");
+  const startOverButton = $(".ct-btn-start-over");
+  const printButton = $(".ct-btn-print");
+  const q6SelectField = $(".ct-q6-selection__select");
+
+  termsCheckbox.change(function () {
+    const isComparisonTool = $(this).hasClass("ct-terms");
+
+    if (isComparisonTool) {
+      formInputs("ct");
+    } else {
+      formInputs();
+    }
+  });
+
+  ctInfoBackButton.click(closeModal);
+  closeButton.click(closeModal);
+  startOverButton.click(resetForm);
+  printButton.click(printPDF);
+  q6SelectField.change(function () {
+    const val = q6SelectField.val();
+    const nextButton = $(this).closest(".ct-section-6").find(".ct-btn");
+
+    if (val) {
+      nextButton.removeClass("ct-disabled");
+    }
+  });
+  // q6Field.click(openQ6Selection);
+
+  if (ctField.length) {
+    ctField.each(function (index, value) {
+      validateField($(value).find("input"));
+    });
+  }
+
+  if (ctBtn.length) {
+    ctBtn.on("click", function (e) {
+      e.preventDefault();
+
+      const questionNumber = $(this).closest(".ct-section").attr("section");
+      const currentSection = $(".ct-section.active");
+
+      if ($(this).hasClass("ct-proceed")) {
+        const userId = Cookies.get("userId");
+
+        userId && fetchUserData(userId);
+      } else if ($(this).hasClass("ct-form-submit")) {
+        //validate form
+        formInputs();
+      } else if ($(this).hasClass("ct-radio-question")) {
+        const answer = $(this)
+          .closest(".ct-section")
+          .find(`input[name="q${questionNumber}"]:checked`)
+          .val();
+
+        saveAnswer(questionNumber, answer);
+        // calculatePoints(questionNumber, answer);
+        updateHeaderCity();
+      } else if ($(this).hasClass("ct-q6")) {
+        let answer;
+
+        answer = $(this).closest(".ct-section").find(`select`).val();
+
+        if (!answer) {
+          answer = $(this)
+            .closest(".ct-section")
+            .find(`input[name="q${questionNumber}"]:checked`)
+            .val();
+        }
+
+        saveAnswer(questionNumber, answer);
+      } else {
+        const answer = $(this)
+          .closest(".ct-section")
+          .find(`input[name="q${questionNumber}"]`)
+          .val();
+
+        saveAnswer(questionNumber, answer);
+        // calculatePoints(questionNumber, answer);
+        updateHeaderCity();
+      }
+
+      if (currentSection.hasClass("ct-section-compare")) {
+        validateInputtedCities();
+      } else {
+        if (
+          window.skipForm &&
+          currentSection
+            .removeClass("active")
+            .next()
+            .hasClass("ct-section-form")
+        ) {
+          currentSection.removeClass("active").next().next().addClass("active");
+        } else {
+          currentSection.removeClass("active").next().addClass("active");
+        }
+
+        showHeading($(".ct-section.active").next().index());
+
+        focusTextField();
+
+        if ($(".ct-section.active").hasClass("ct-section-results")) {
+          loadingAnimation();
+          calculatePoints();
+        }
+      }
+
+      // $(".ct-section.active").removeClass("active").next().addClass("active");
+      // showHeading($(".ct-section.active").next().index());
+
+      // focusTextField();
+
+      if ($(this).closest(".ct-section").attr("section")) {
+        stepper(parseInt($(this).closest(".ct-section").attr("section")));
+      }
+    });
+  }
+
+  if (ctBack.length) {
+    ctBack.on("click", function (e) {
+      e.preventDefault();
+      showHeading($(".ct-section.active").index());
+      if (
+        window.skipForm &&
+        $(".ct-section.active").prev().hasClass("ct-section-form")
+      ) {
+        $(".ct-section.active")
+          .removeClass("active")
+          .prev()
+          .prev()
+          .addClass("active");
+      } else {
+        $(".ct-section.active").removeClass("active").prev().addClass("active");
+      }
+
+      if ($(this).closest(".ct-section").attr("section")) {
+        stepper(parseInt($(this).closest(".ct-section").attr("section")) - 2);
+      }
+    });
+  }
+
+  if (ctSelection.length) {
+    ctSelection.each(function (index, value) {
+      validateRadio($(value).find("input"));
+    });
+  }
+
+  cityAutocomplete();
+  customDropdown();
+});
+
+const ctForm = $(".comparison-tool .ct-wrap");
+const ctResults = $(".ct-results");
+const languageContainer = $(".language-container");
+let comparisonToolData = {};
+let compareCityData = {};
+let points = {};
+let totalPoints;
+let formTimeout = null;
+let resultsTimeout = null;
+let progressInterval = null;
+let loadingTimeout = null;
+
+function validateInputtedCities() {
+  const yourCity = $(".ct-field-your-city").val();
+  const compareCity = $(".ct-field-compare-city").val();
+  const isJpVersion = $(".ct-section-compare--jp").length > 0;
+  let participatingCities;
+
+  if (isJpVersion) {
+    participatingCities = rankings["2021"].map((city) => city.cityJp);
+  } else {
+    participatingCities = rankings["2021"].map((city) => city.city);
+  }
+
+  // if (
+  //   participatingCities.includes(yourCity.toLowerCase()) &&
+  //   participatingCities.includes(compareCity.toLowerCase())
+  // ) {
+  //   console.log("existing");
+  //   saveCitiesToCompare();
+  //   updateHeaderCity();
+
+  //   //move to the next section
+  //   $(".ct-section.active").removeClass("active").next().addClass("active");
+  //   showHeading($(".ct-section.active").next().index());
+
+  //   $(".ct-field-your-city").each(function () {
+  //     $(this).addClass("valid").removeClass("invalid");
+  //   });
+  // } else {
+  //   $(".ct-field-your-city").each(function () {
+  //     $(this).addClass("invalid").removeClass("valid");
+  //   });
+  // }
+
+  // //sync yourCity in section compare & results page
+  // $(".ct-field-your-city").each(function () {
+  //   $(this).val(yourCity);
+  // });
+  if (participatingCities.includes(compareCity.toLowerCase()) && yourCity) {
+    saveCitiesToCompare();
+    updateHeaderCity();
+
+    //move to the next section
+    $(".ct-section.active").removeClass("active").next().addClass("active");
+    showHeading($(".ct-section.active").next().index());
+  }
+
+  //sync yourCity in section compare & results page
+  $(".ct-field-your-city").each(function () {
+    $(this).val(yourCity);
+  });
+}
+
+function saveComparisonToolData(key, val) {
+  comparisonToolData[key] = val;
+
+  // console.log(comparisonToolData);
+}
+
+function printPDF() {
+  window.print();
+
+  // saves print analytics
+  // ga("send", "open-content", "report", "comparison-tool-results");
+}
+
+function closeModal() {
+  console.log("close");
+  const ctModal = $(".comparison-tool");
+  const sectionLayer = $(".section-layer");
+  const ctWrap = $(".comparison-tool").find(".ct-wrap");
+  const ctInfo = $(".ct-section-info");
+  const ctLoading = $(".ct-section-results");
+  const radioButtons = $(".ct-radio input");
+  const inputFields = $(".ct-field");
+  const yourCityField = $(".ct-field-your-city");
+  const currentCity = comparisonToolData.yourCity;
+  const ctTitle = $(".ct-title");
+  const ctStepper = $(".ct-stepper");
+
+  ctModal.fadeOut().removeClass("is-active");
+  sectionLayer.css({ height: "100%", opacity: "1" });
+  languageContainer.css("display", "flex");
+  $(".ct-barometer-arrow").removeClass("animate");
+  TweenMax.set(".ct-results.animated .animated-child", { y: 25, opacity: 0 });
+
+  if ($(".inner").length) {
+    $("body").css("position", "inherit");
+  }
+
+  setTimeout(() => {
+    //resets the form if closed on the results page
+    if (ctResults.hasClass("active")) {
+      ctResults.removeClass("active");
+      ctLoading.removeClass("active");
+      ctTitle.addClass("ct-hide");
+      ctStepper.addClass("ct-hide");
+      ctWrap.css({
+        opacity: 1,
+        display: "block",
+        "pointer-events": "auto",
+      });
+
+      ctInfo.addClass("active");
+
+      //resets form values
+      $(radioButtons).each(function () {
+        $(this).prop("checked", false);
+      });
+
+      $(inputFields).each(function () {
+        $(this).val("");
+      });
+
+      //saves autoFill "your city"
+      yourCityField.val(currentCity);
+
+      resetStepper();
+    }
+  }, 1000);
+}
+
+function formInputs(form) {
+  const downloadButton = $(".ct-download");
+  const submitButton = $(".ct-form-submit");
+  var formData = {
+    name: form === "ct" ? $(".ct-field-name").val() : $(".df-field-name").val(),
+    email:
+      form === "ct" ? $(".ct-field-email").val() : $(".df-field-email").val(),
+    jobTitle:
+      form === "ct"
+        ? $(".ct-field-job-title").val()
+        : $(".df-field-job-title").val(),
+    companyName:
+      form === "ct"
+        ? $(".ct-field-company-name").val()
+        : $(".df-field-company-name").val(),
+    agreeToTerms:
+      form === "ct"
+        ? $(".ct-terms").prop("checked")
+        : $(".df-terms").prop("checked"),
+  };
+
+  if (
+    formData.name &&
+    formData.email &&
+    formData.jobTitle &&
+    formData.companyName &&
+    formData.agreeToTerms
+  ) {
+    form === "ct"
+      ? submitButton.removeClass("ct-disabled")
+      : downloadButton.removeClass("ct-disabled");
+
+    console.log("run");
+
+    saveComparisonToolData("name", formData.name);
+    saveComparisonToolData("jobTitle", formData.jobTitle);
+    saveComparisonToolData("email", formData.email);
+    saveComparisonToolData("companyName", formData.companyName);
+  } else {
+    submitButton.addClass("ct-disabled");
+    downloadButton.addClass("ct-disabled");
+  }
+}
+
+function cityAutocomplete() {
+  var field = $(".ct-automplete");
+  var cityDD = $(".ct-custom-autocomplete");
+
+  field.on("keyup", function (e) {
+    var val = $(this).val();
+    // let filteredCity;
+    var filteredCity = _.filter(worldCities, function (obj) {
+      // return obj.name.toLowerCase().indexOf(val.toLowerCase()) >= 0;
+      return obj.name.toLowerCase().startsWith(val.toLowerCase());
+    });
+
+    // if (cityDD.hasClass("ct-custom-autocomplete--jp")) {
+    //   filteredCity = _.filter(rankings["2021"], function (obj) {
+    //     return obj.cityJp === val;
+    //   });
+    // } else {
+    //   filteredCity = _.filter(rankings["2021"], function (obj) {
+    //     // return obj.name.toLowerCase().indexOf(val.toLowerCase()) >= 0;
+
+    //     return obj.city.toLowerCase().startsWith(val.toLowerCase());
+    //   });
+    // }
+
+    if (filteredCity.length === worldCities.length) {
+      if (cityDD.hasClass("active")) {
+        cityDD.removeClass("active");
+        cityDD.slideUp();
+      }
+    } else {
+      // if (cityDD.hasClass("ct-custom-autocomplete--jp")) {
+      //   renderAutocompleteListJp(cityDD.find("ul"), filteredCity);
+      // } else {
+      //   renderAutocompleteListEng(cityDD.find("ul"), filteredCity);
+      // }
+      renderAutocompleteListEng(cityDD.find("ul"), filteredCity);
+      if (!cityDD.hasClass("active")) {
+        cityDD.addClass("active");
+        cityDD.slideDown();
+      }
+    }
+  });
+}
+
+function renderAutocompleteListEng(element, data) {
+  var ddHtml = "";
+  _.forEach(data, function (obj, key) {
+    ddHtml += "<li>";
+    ddHtml += '    <a href="#" class="ct-city-item">' + obj.name + "</a>";
+    ddHtml += "</li>";
+  });
+  element.html(ddHtml);
+
+  $(".ct-city-item").on("click", function (e) {
+    var val = $(this).text();
+    $(".ct-automplete").val(val);
+    $(".ct-automplete").removeClass("invalid");
+    $(".ct-custom-autocomplete").slideUp();
+    $(".ct-custom-autocomplete").removeClass("active");
+
+    checkCities();
+  });
+}
+
+function renderAutocompleteListJp(element, data) {
+  var ddHtml = "";
+  _.forEach(data, function (obj, key) {
+    ddHtml += "<li>";
+    ddHtml += '    <a href="#" class="ct-city-item">' + obj.cityJp + "</a>";
+    ddHtml += "</li>";
+  });
+  element.html(ddHtml);
+
+  $(".ct-city-item").on("click", function (e) {
+    var val = $(this).text();
+    $(".ct-automplete").val(val);
+    $(".ct-custom-autocomplete").slideUp();
+    $(".ct-custom-autocomplete").removeClass("active");
+  });
+}
+
+function customDropdown() {
+  var ctFieldDD = $(".ct-field-dd");
+  var ctDropdown = $(".ct-custom-dd");
+
+  if (ctFieldDD.length && ctDropdown.length) {
+    var sortedRankings = _.orderBy(
+      rankings["2021"],
+      function (obj, key) {
+        return obj.city;
+      },
+      ["asc"]
+    );
+
+    var ddHtml = "";
+
+    if (ctFieldDD.hasClass("ct-field-dd--jp")) {
+      _.forEach(sortedRankings, function (obj, key) {
+        ddHtml += "<li>";
+        ddHtml += '    <a href="#" class="ct-dd-item">' + obj.cityJp + "</a>";
+        ddHtml += "</li>";
+      });
+    } else {
+      _.forEach(sortedRankings, function (obj, key) {
+        ddHtml += "<li>";
+        ddHtml += '    <a href="#" class="ct-dd-item">' + obj.city + "</a>";
+        ddHtml += "</li>";
+      });
+    }
+
+    ctDropdown.find("ul").html(ddHtml);
+
+    $(".ct-dd").on("click", function () {
+      ctDropdown.slideDown();
+      ctFieldDD.removeClass("invalid");
+    });
+
+    var ctItemDD = $(".ct-dd-item:not(.ct-dd-item--q6)");
+    ctItemDD.on("click", function (e) {
+      const cityField = this;
+      var val = $(this).text();
+      ctFieldDD.val(val);
+      ctDropdown.slideUp();
+      ctFieldDD.removeClass("invalid");
+
+      checkCities();
+
+      const isAlreadyAnswered = localStorage.getItem("totalPoints");
+      const isInResultScreen = $(".ct-results").hasClass("active");
+
+      //recalculate
+      if (isAlreadyAnswered && isInResultScreen) {
+        comparisonToolData.compareCity = val;
+        // localStorage.setItem("answers", JSON.stringify(answers));
+        calculatePoints();
+      }
+    });
+
+    $("body").on("click", function (e) {
+      if (!$(e.target).closest(".ct-form-dropdown").length) {
+        ctDropdown.slideUp();
+      }
+    });
+  }
+}
+
+// function openQ6Selection() {
+//   console.log("q6");
+//   const dropdownField = $(".ct-field-q6");
+//   const dropdown = $(".ct-dd-q6__dropdown");
+
+//   dropdown.slideDown();
+
+//   var ctItemDD = $(".ct-dd-item");
+//   ctItemDD.on("click", function () {
+//     const val = $(this).attr("value");
+//     const text = $(this).text();
+//     const nextButton = $(".ct-btn");
+
+//     dropdownField.val(text);
+//     dropdownField.attr("data-value", val);
+//     dropdown.slideUp();
+
+//     if (dropdownField.val()) {
+//       nextButton.removeClass("ct-disabled");
+//     }
+//   });
+
+//   $("body").on("click", function (e) {
+//     if (!$(e.target).closest(".ct-form-dropdown").length) {
+//       dropdown.slideUp();
+//     }
+//   });
+// }
+
+function stepper(index) {
+  if (index > -1) {
+    $(".ct-step").eq(index).addClass("active").removeClass("is-done");
+    $(".ct-step").eq(index).prevAll().addClass("is-done").removeClass("active");
+    $(".ct-step").eq(index).nextAll().removeClass("is-done active");
+  }
+}
+
+function showHeading(index) {
+  if (index > -1) {
+    if (index > 2) {
+      //index < 15
+      $(".ct-title").fadeIn().removeClass("ct-hide");
+      if (index >= 4) {
+        $(".ct-stepper").fadeIn().removeClass("ct-hide").css("display", "flex");
+      } else {
+        $(".ct-stepper").fadeOut().addClass("ct-hide");
+      }
+    } else {
+      $(".ct-title").fadeOut().addClass("ct-hide");
+    }
+  } else {
+    $(".ct-stepper").fadeOut().addClass("ct-hide");
+  }
+}
+
+function validateRadio(element) {
+  element.on("change", function () {
+    var isChecked = $(this).prop("checked");
+
+    console.log(isChecked);
+
+    if (isChecked) {
+      $(element)
+        .closest(".ct-section")
+        .find(".ct-btn")
+        .removeClass("ct-disabled");
+    } else {
+      $(element).closest(".ct-section").find(".ct-btn").addClass("ct-disabled");
+    }
+  });
+}
+
+function validateField(element) {
+  // element.on("keydown", function (e) {
+  //   if ($(this).hasClass("ct-format")) {
+  //     const isNumber = parseInt(e.key);
+  //     const isBackspace = e.key === "Backspace";
+  //     const isZeroKey = e.key === "0";
+
+  //     console.log(e.key);
+  //     if (!isNumber && !isBackspace && !isZeroKey) {
+  //       e.preventDefault();
+  //     }
+  //   }
+  // });
+
+  element.on("keyup", function (e) {
+    const isUserInfo =
+      $(this).hasClass("ct-field-name") ||
+      $(this).hasClass("ct-field-email") ||
+      $(this).hasClass("ct-field-job-title") ||
+      $(this).hasClass("ct-field-company-name");
+    const isNumber = $(element).attr("type") === "number";
+
+    let val = $(this).val().replace(",", "");
+    const maxValue = parseInt($(this).attr("data-max"));
+
+    if (val.length > 0) {
+      $(this).addClass("valid").removeClass("invalid");
+    } else {
+      $(this).addClass("invalid").removeClass("valid");
+    }
+
+    if (!isUserInfo && checkAllField()) {
+      $(".active .ct-btn").removeClass("ct-disabled");
+    } else {
+      const ctBtn = $(".active .ct-btn");
+
+      if (!ctBtn.hasClass("ct-proceed")) {
+        ctBtn.addClass("ct-disabled");
+      }
+    }
+
+    if ($(this).hasClass("ct-format")) {
+      let val = $(this).val();
+
+      const isNumber = parseInt(e.key);
+      const isBackspace = e.key === "Backspace";
+
+      if (isNumber) {
+        console.log(val);
+      } else if (isBackspace) {
+        $(this).val().slice(0, -1);
+      } else {
+        $(this).val().slice(0, -1);
+      }
+    }
+
+    switch (maxValue) {
+      case 100:
+        restrictValue("100", this, val);
+        break;
+      case 120:
+        restrictValue("120", this, val);
+        break;
+      case 1000:
+        restrictValue("1000", this, val);
+        break;
+      case 100000:
+        restrictValue("100000", this, val);
+        break;
+      default:
+        break;
+    }
+  });
+
+  console.log("validate");
+
+  element.on("blur", function () {
+    const isUserInfo =
+      $(this).hasClass("ct-field-name") ||
+      $(this).hasClass("ct-field-email") ||
+      $(this).hasClass("ct-field-job-title") ||
+      $(this).hasClass("ct-field-company-name");
+
+    var val = $(this).val();
+    if (val.length > 0) {
+      if ($(this).attr("type") === "email") {
+        if (validateEmail(val)) {
+          $(this).addClass("valid").removeClass("invalid");
+        } else {
+          $(this).addClass("invalid").removeClass("valid");
+        }
+      } else {
+        $(this).addClass("valid").removeClass("invalid");
+      }
+    } else {
+      $(this).addClass("invalid").removeClass("valid");
+    }
+
+    if (!isUserInfo && checkAllField()) {
+      $(".active .ct-btn").removeClass("ct-disabled");
+    }
+
+    // else {
+    //   $(".active .ct-btn").addClass("ct-disabled");
+    // }
+  });
+}
+
+function focusTextField() {
+  const activeTextField = $(".ct-section.active .ct-number");
+
+  if (activeTextField.length > 0) {
+    activeTextField.focus();
+  }
+}
+
+function restrictValue(max, field, value) {
+  switch (max) {
+    case "100":
+      if (parseFloat(value) > 100) {
+        $(field).val("100");
+      }
+      break;
+    case "120":
+      if (parseFloat(value) > 120) {
+        $(field).val("120");
+      }
+      break;
+    case "1000":
+      if (parseFloat(value) > 1000) {
+        $(field).val("1000");
+        // $(field).attr("value", "1,000");
+      }
+      break;
+    case "100000":
+      if (parseFloat(value) > 100000) {
+        // $(field).attr("value", "100,000");
+        $(field).val("100000");
+      }
+      break;
+    default:
+      break;
+  }
+
+  if (parseFloat(value) < 0) {
+    $(field).val("0");
+  }
+}
+
+function checkAllField() {
+  var isValid = true;
+  $(".active .ct-field").each(function () {
+    var element = $(this);
+    if (element.val() === "") {
+      isValid = false;
+    } else {
+      if ($(this).attr("type") === "email" && !validateEmail(element.val())) {
+        isValid = false;
+      }
+    }
+  });
+  return isValid;
+}
+
+function validateEmail(value) {
+  const re =
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(value);
+}
+
+function saveCitiesToCompare() {
+  const yourCity = $(".ct-field-your-city").val();
+  const compareCity = $(".ct-field-compare-city").val();
+  const isJapanForm = $(".comparison-tool.jp").length > 0;
+
+  saveComparisonToolData("yourCity", yourCity);
+  saveComparisonToolData("compareCity", compareCity);
+
+  isJapanForm
+    ? saveComparisonToolData("locale", "jp")
+    : saveComparisonToolData("locale", "en");
+}
+
+function checkCities() {
+  const yourCity = $(".ct-field-your-city").val();
+  const compareCity = $(".ct-field-compare-city").val();
+
+  if (yourCity && compareCity) {
+    $(".active .ct-btn").removeClass("ct-disabled");
+  } else {
+    $(".active .ct-btn").addClass("ct-disabled");
+  }
+}
+
+function updateHeaderCity() {
+  const selectedCityText = $(".ct-selected-city");
+  const selectedCity = comparisonToolData.yourCity;
+  const compareCity = comparisonToolData.compareCity;
+  const headerSelectedCity = $(".ct-header-your-city");
+  const headerCompareCity = $(".ct-header-compare-city");
+
+  selectedCityText.text(selectedCity);
+  headerSelectedCity.text(selectedCity);
+  headerCompareCity.text(compareCity);
+}
+
+function saveAnswer(questionNumber, answer) {
+  switch (questionNumber) {
+    case "1":
+      // answers.q1 = answer;
+      saveComparisonToolData("q1", answer);
+      break;
+    case "2":
+      // answers.q2 = answer;
+      saveComparisonToolData("q2", answer);
+      break;
+    case "3":
+      // answers.q3 = answer;
+      saveComparisonToolData("q3", answer);
+      break;
+    case "4":
+      // answers.q4 = answer;
+      saveComparisonToolData("q4", answer);
+      break;
+    case "5":
+      // answers.q5 = answer;
+      saveComparisonToolData("q5", answer);
+      break;
+    case "6":
+      // answers.q6 = answer;
+      saveComparisonToolData("q6", answer);
+      break;
+    case "7":
+      // answers.q7 = answer;
+      saveComparisonToolData("q7", answer);
+      break;
+    case "8":
+      // answers.q8 = answer;
+      saveComparisonToolData("q8", answer);
+      break;
+    case "9":
+      // answers.q9 = answer;
+      saveComparisonToolData("q9", answer);
+      break;
+    case "10":
+      // answers.q10 = answer;
+      saveComparisonToolData("q10", answer);
+      break;
+    case "11":
+      // answers.q11 = answer;
+      saveComparisonToolData("q11", answer);
+      break;
+    case "12":
+      // answers.q12 = answer;
+      saveComparisonToolData("q12", answer);
+      break;
+    default:
+      break;
+  }
+
+  // localStorage.setItem("answers", JSON.stringify(answers));
+}
+
+function loadingAnimation() {
+  const counter = $(".ct-loading__number");
+  let start = 0;
+  const end = 100;
+
+  TweenMax.set(".overlay-gradient-progress", { drawSVG: "100%" });
+  var tn = TweenMax.to(".overlay-gradient-progress", 1.5, {
+    delay: 0.2,
+    drawSVG: "0%",
+    ease: Linear.easeNone,
+    onUpdate: function (e) {
+      console.log(tn.progress());
+
+      var p = (tn.progress() * 100).toFixed(0);
+      counter.text(p);
+    },
+    onComplete: function () {
+      fadeOutLoading();
+    },
+  });
+
+  // progressInterval = setInterval(function () {
+  //   if (start < end) {
+  //     start++;
+  //   } else {
+  //     setTimeout(fadeOutLoading, 1500);
+  //   }
+
+  //   counter.text(start);
+  // }, 20);
+}
+
+function fadeOutLoading() {
+  clearInterval(progressInterval);
+
+  const loadingScreen = $(".ct-section-results");
+
+  loadingScreen.css("opacity", "0");
+
+  loadingTimeout = setTimeout(function () {
+    loadingScreen.removeClass("active");
+  }, 1500);
+
+  showResults();
+
+  //hides the language container
+  languageContainer.css("display", "none");
+}
+
+function showResults() {
+  clearTimeout(loadingTimeout);
+  const ctWrap = $(".comparison-tool").find(".ct-wrap");
+
+  ctWrap.css("opacity", "0");
+  formTimeout = setTimeout(function () {
+    ctWrap.css("display", "none");
+  }, 200);
+
+  resultsTimeout = setTimeout(function () {
+    ctResults.fadeIn().addClass("active");
+    ctResultAnimate();
+
+    console.log($(".inner"));
+  }, 200);
+}
+
+function ctResultAnimate() {
+  TweenMax.staggerTo(
+    ".ct-results.animated .animated-child",
+    0.7,
+    {
+      y: 0,
+      opacity: 1,
+      force3D: false,
+      ease: Power4.easeOut,
+      onComplete: function () {
+        $(".ct-barometer-arrow").addClass("animate");
+      },
+    },
+    0.3
+  );
+}
+
+function calculatePoints() {
+  const japaneseCharactersPattern =
+    /^([\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f])+/i;
+  let compareCity = comparisonToolData.compareCity;
+  let englishCity;
+
+  if (compareCity.match(japaneseCharactersPattern)) {
+    englishCity = rankings["2021"].find(
+      (city) => city.cityJp === compareCity
+    ).city;
+
+    compareCity = englishCity;
+  }
+
+  console.log("calculating points");
+  console.log(compareCity);
+
+  calculateQuestionOne();
+  calculateQuestionTwo();
+  calculateQuestionThree();
+  calculateQuestionFour();
+  calculateQuestionFive();
+  calculateQuestionSix();
+  calculateQuestionSeven();
+  calculateQuestionEight();
+  calculateQuestionNine();
+  calculateQuestionTen();
+  calculateQuestionEleven();
+  calculateQuestionTwelve();
+
+  function calculateQuestionOne() {
+    for (let i in comparisonScale.secureSmartCities) {
+      const cities = comparisonScale.secureSmartCities[i];
+
+      if (cities.includes(compareCity.toLowerCase())) {
+        const compareCityScore = parseInt(i);
+
+        if (parseFloat(comparisonToolData.q1) === compareCityScore) {
+          points.q1 = 1;
+        } else if (parseFloat(comparisonToolData.q1) > compareCityScore) {
+          points.q1 = 2;
+        } else {
+          points.q1 = 0;
+        }
+
+        //saves benchmark city data
+        compareCityData.q1 = compareCityScore;
+      }
+    }
+  }
+
+  function calculateQuestionTwo() {
+    const compareCityInternetAccess = internetAccess.find(
+      (country) => country.city === compareCity.toLowerCase()
+    ).data;
+
+    if (
+      parseFloat(comparisonToolData.q2) ===
+      parseFloat(compareCityInternetAccess)
+    ) {
+      points.q2 = 1;
+    } else if (
+      parseFloat(comparisonToolData.q2) > parseFloat(compareCityInternetAccess)
+    ) {
+      points.q2 = 2;
+    } else {
+      points.q2 = 0;
+    }
+
+    //saves benchmark city data
+    compareCityData.q2 = parseFloat(compareCityInternetAccess);
+  }
+
+  function calculateQuestionThree() {
+    const compareCityDoctors = noOfDoctorsPer1000.find(
+      (country) => country.city === compareCity.toLowerCase()
+    ).data;
+
+    if (parseFloat(comparisonToolData.q3) === parseFloat(compareCityDoctors)) {
+      points.q3 = 1;
+    } else if (
+      parseFloat(comparisonToolData.q3) > parseFloat(compareCityDoctors)
+    ) {
+      points.q3 = 2;
+    } else {
+      points.q3 = 0;
+    }
+
+    //saves benchmark city data
+    compareCityData.q3 = parseFloat(compareCityDoctors);
+  }
+
+  function calculateQuestionFour() {
+    const compareCityLifeExpentancy = lifeExpentancyYears.find(
+      (country) => country.city === compareCity.toLowerCase()
+    ).data;
+
+    if (
+      parseFloat(comparisonToolData.q4) ===
+      parseFloat(compareCityLifeExpentancy)
+    ) {
+      points.q4 = 1;
+    } else if (
+      parseFloat(comparisonToolData.q4) > parseFloat(compareCityLifeExpentancy)
+    ) {
+      points.q4 = 2;
+    } else {
+      points.q4 = 0;
+    }
+
+    //saves benchmark city data
+    compareCityData.q4 = parseFloat(compareCityLifeExpentancy);
+  }
+
+  function calculateQuestionFive() {
+    const compareCityMortality = mortalityRate.find(
+      (country) => country.city === compareCity.toLowerCase()
+    ).data;
+
+    if (
+      parseFloat(comparisonToolData.q5) === parseFloat(compareCityMortality)
+    ) {
+      points.q5 = 1;
+    } else if (
+      parseFloat(comparisonToolData.q5) < parseFloat(compareCityMortality)
+    ) {
+      points.q5 = 2;
+    } else {
+      points.q5 = 0;
+    }
+
+    //saves benchmark city data
+    compareCityData.q5 = parseFloat(compareCityMortality);
+  }
+
+  function calculateQuestionSix() {
+    for (let i in comparisonScale.disasterManagement) {
+      const cities = comparisonScale.disasterManagement[i];
+
+      if (cities.includes(compareCity.toLowerCase())) {
+        const compareCityDisasterManagement = parseInt(i);
+
+        if (
+          parseFloat(comparisonToolData.q6) === compareCityDisasterManagement
+        ) {
+          points.q6 = 1;
+        } else if (
+          parseFloat(comparisonToolData.q6) > compareCityDisasterManagement
+        ) {
+          points.q6 = 2;
+        } else {
+          points.q6 = 0;
+        }
+
+        //saves benchmark city data
+        compareCityData.q6 = compareCityDisasterManagement;
+      }
+    }
+  }
+
+  function calculateQuestionSeven() {
+    for (let i in comparisonScale.disasterRisk) {
+      const cities = comparisonScale.disasterRisk[i];
+
+      if (cities.includes(compareCity.toLowerCase())) {
+        const compareCityDisasterRisk = parseInt(i);
+
+        if (parseFloat(comparisonToolData.q7) === compareCityDisasterRisk) {
+          points.q7 = 1;
+        } else if (
+          parseFloat(comparisonToolData.q7) > compareCityDisasterRisk
+        ) {
+          points.q7 = 2;
+        } else {
+          points.q7 = 0;
+        }
+
+        //saves benchmark city data
+        compareCityData.q7 = compareCityDisasterRisk;
+      }
+    }
+  }
+
+  function calculateQuestionEight() {
+    const compareCitySocialAssistance = socialAssistance.find(
+      (country) => country.city === compareCity.toLowerCase()
+    ).data;
+
+    if (
+      parseFloat(comparisonToolData.q8) ===
+      parseFloat(compareCitySocialAssistance)
+    ) {
+      points.q8 = 1;
+    } else if (
+      parseFloat(comparisonToolData.q8) >
+      parseFloat(compareCitySocialAssistance)
+    ) {
+      points.q8 = 2;
+    } else {
+      points.q8 = 0;
+    }
+
+    //saves benchmark city data
+    compareCityData.q8 = parseFloat(compareCitySocialAssistance);
+  }
+
+  function calculateQuestionNine() {
+    for (let i in comparisonScale.crimes) {
+      const cities = comparisonScale.crimes[i];
+
+      if (cities.includes(compareCity.toLowerCase())) {
+        const compareCityCrimes = parseInt(i);
+
+        if (parseFloat(comparisonToolData.q9) === compareCityCrimes) {
+          points.q9 = 1;
+        } else if (parseFloat(comparisonToolData.q9) > compareCityCrimes) {
+          points.q9 = 2;
+        } else {
+          points.q9 = 0;
+        }
+
+        //saves benchmark city data
+        compareCityData.q9 = compareCityCrimes;
+      }
+    }
+  }
+
+  function calculateQuestionTen() {
+    for (let i in comparisonScale.masterplan) {
+      const cities = comparisonScale.masterplan[i];
+
+      if (cities.includes(compareCity.toLowerCase())) {
+        const compareCityMasterplan = parseInt(i);
+
+        if (parseFloat(comparisonToolData.q10) === compareCityMasterplan) {
+          points.q10 = 1;
+        } else if (parseFloat(comparisonToolData.q10) > compareCityMasterplan) {
+          points.q10 = 2;
+        } else {
+          points.q10 = 0;
+        }
+
+        //saves benchmark city data
+        compareCityData.q10 = compareCityMasterplan;
+      }
+    }
+  }
+
+  function calculateQuestionEleven() {
+    for (let i in comparisonScale.airQuality) {
+      const cities = comparisonScale.airQuality[i];
+
+      if (cities.includes(compareCity.toLowerCase())) {
+        const compareCityAirQuality = parseInt(i);
+
+        if (parseFloat(comparisonToolData.q11) === compareCityAirQuality) {
+          points.q11 = 1;
+        } else if (parseFloat(comparisonToolData.q11) > compareCityAirQuality) {
+          points.q11 = 2;
+        } else {
+          points.q11 = 0;
+        }
+
+        //saves benchmark city data
+        compareCityData.q11 = compareCityAirQuality;
+      }
+    }
+  }
+
+  function calculateQuestionTwelve() {
+    const compareCityTreeCover = treeCover.find(
+      (country) => country.city === compareCity.toLowerCase()
+    ).data;
+
+    if (
+      parseFloat(comparisonToolData.q12) === parseFloat(compareCityTreeCover)
+    ) {
+      points.q12 = 1;
+    } else if (
+      parseFloat(comparisonToolData.q12) > parseFloat(compareCityTreeCover)
+    ) {
+      points.q12 = 2;
+    } else {
+      points.q12 = 0;
+    }
+
+    //saves benchmark city data
+    compareCityData.q12 = parseFloat(compareCityTreeCover);
+  }
+
+  localStorage.setItem("points", JSON.stringify(points));
+  localStorage.setItem("compareCityData", JSON.stringify(compareCityData));
+
+  // saveComparisonToolAnalytics();
+  calculateAndDisplayTotalPoints();
+}
+
+// function saveComparisonToolAnalytics() {
+// ga(
+//   "send",
+//   "poll",
+//   "poll-question-1",
+//   `poll-answer-selected-${comparisonToolData.q1}`
+// );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-2",
+//     `poll-answer-selected-${comparisonToolData.q2}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-3",
+//     `poll-answer-selected-${comparisonToolData.q3}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-4",
+//     `poll-answer-selected-${comparisonToolData.q4}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-5",
+//     `poll-answer-selected-${comparisonToolData.q5}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-6",
+//     `poll-answer-selected-${comparisonToolData.q6}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-7",
+//     `poll-answer-selected-${comparisonToolData.q7}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-8",
+//     `poll-answer-selected-${comparisonToolData.q8}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-5",
+//     `poll-answer-selected-${comparisonToolData.q9}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-6",
+//     `poll-answer-selected-${comparisonToolData.q10}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-7",
+//     `poll-answer-selected-${comparisonToolData.q11}`
+//   );
+//   ga(
+//     "send",
+//     "poll",
+//     "poll-question-8",
+//     `poll-answer-selected-${comparisonToolData.q12}`
+//   );
+// }
+// function saveComparisonToLocalDatabase(comparisonToolData) {
+//   $.ajax({
+//     type: "POST",
+//     url: result.ajaxurl,
+//     data: {
+//       action: "save_comparison_results",
+//       data: comparisonToolData,
+//     },
+//     success: function (response) {
+//       const uniqueId = response.data.ID;
+//       setCookie(uniqueId);
+//     },
+//   });
+// }
+
+function calculateAndDisplayTotalPoints() {
+  const total = Object.values(points).reduce((accumulator, current) => {
+    return accumulator + current;
+  });
+
+  console.log("displaying total");
+
+  totalPoints = total;
+  localStorage.setItem("totalPoints", totalPoints);
+
+  saveComparisonToolData("totalScore", total);
+  saveComparisonToLocalDatabase(comparisonToolData);
+
+  updateResult();
+}
+
+function updateResult() {
+  const isJapanVersion = $(".ct-results--jp").length > 0;
+  const scoreText = $(".ct-score");
+  const compareText = $(".ct-compare-text");
+  const compareCityText = $(".ct-city-compare-text");
+  const yourCity = comparisonToolData.yourCity;
+  const compareCity = comparisonToolData.compareCity;
+  const savedTotalPoints = localStorage.getItem("totalPoints");
+  const barometer = $(".ct-barometer-arrow");
+  const updateBarometer = (activeClass) => {
+    setTimeout(() => {
+      barometer.removeClass("active-1 active-2 active-3 active-4 active-5");
+      barometer.addClass(activeClass);
+    }, 800);
+  };
+
+  clearTimeout(formTimeout);
+  clearTimeout(resultsTimeout);
+
+  console.log("update result");
+
+  savedTotalPoints ? scoreText.text(savedTotalPoints) : scoreText.text("0");
+
+  if (parseInt(savedTotalPoints) >= 19) {
+    if (isJapanVersion) {
+      // updateComparisonText(" 非常に高い ");
+      updateComparisonTextJP("よりかなり高い評価です");
+      updateStatusText("比較対象都市よりもかなり高い");
+    } else {
+      updateComparisonText(" IS MUCH HIGHER THAN ");
+      updateStatusText("MUCH HIGHER THAN BENCHMARK CITY");
+    }
+    updateBarometer("active-5");
+  } else if (parseInt(savedTotalPoints) >= 14) {
+    if (isJapanVersion) {
+      // updateComparisonText(" 高い ");
+      updateComparisonTextJP("より高い評価です");
+      updateStatusText("比較対象都市よりも高い");
+    } else {
+      updateComparisonText(" IS HIGHER THAN ");
+      updateStatusText("HIGHER THAN BENCHMARK CITY");
+    }
+
+    updateBarometer("active-4");
+  } else if (parseInt(savedTotalPoints) >= 11) {
+    if (isJapanVersion) {
+      // updateComparisonText(" 同じ ");
+      updateComparisonTextJP("の評価は同程度です");
+      updateStatusText("比較対象都市と同じ");
+    } else {
+      updateComparisonText(" IS THE SAME AS ");
+      updateStatusText("SAME AS BENCHMARK CITY");
+    }
+
+    updateBarometer("active-3");
+  } else if (parseInt(savedTotalPoints) >= 6) {
+    if (isJapanVersion) {
+      // updateComparisonText(" 低い ");
+      updateComparisonTextJP("より低い評価です");
+      updateStatusText("比較対象都市よりも低い");
+    } else {
+      updateComparisonText(" IS LOWER THAN ");
+      updateStatusText("LOWER THAN BENCHMARK CITY");
+    }
+
+    updateBarometer("active-2");
+  } else {
+    if (isJapanVersion) {
+      // updateComparisonText(" 非常に低い ");
+      updateComparisonTextJP("よりかなり低い評価です");
+      updateStatusText("比較対象都市よりもかなり低い");
+    } else {
+      updateComparisonText(" IS MUCH LOWER THAN ");
+      updateStatusText("MUCH LOWER THAN BENCHMARK CITY");
+    }
+
+    updateBarometer("active-1");
+  }
+
+  function updateComparisonText(text) {
+    compareCityText.text(yourCity + text + compareCity);
+  }
+
+  function updateComparisonTextJP(text) {
+    switch (text) {
+      case "よりかなり低い評価です":
+        compareCityText.text(yourCity + "は " + compareCity + text);
+        break;
+      case "より低い評価です":
+        compareCityText.text(yourCity + "は " + compareCity + text);
+        break;
+      case "の評価は同程度です":
+        compareCityText.text(yourCity + " と " + compareCity + text);
+        break;
+      case "より高い評価です":
+        compareCityText.text(yourCity + " は " + compareCity + text);
+        break;
+      case "よりかなり高い評価です":
+        compareCityText.text(yourCity + " は " + compareCity + text);
+        break;
+      default:
+        break;
+    }
+    // compareCityText.text(yourCity + text + compareCity);
+  }
+
+  function updateStatusText(text) {
+    compareText.text(text);
+  }
+
+  updateTableComparison(yourCity, compareCity);
+}
+
+function updateTableComparison(yourCity, compareCity) {
+  const isJapanVersion = $(".ct-results--jp").length > 0;
+  const yourCityText = $(".ct-city-name-1");
+  const compareCityText = $(".ct-city-name-2");
+
+  yourCityText.text(yourCity);
+  compareCityText.text(compareCity);
+
+  updateQuestionOne();
+  updateQuestionTwo();
+  updateQuestionThree();
+  updateQuestionFour();
+  updateQuestionFive();
+  updateQuestionSix();
+  updateQuestionSeven();
+  updateQuestionEight();
+  updateQuestionNine();
+  updateQuestionTen();
+  updateQuestionEleven();
+  updateQuestionTwelve();
+
+  function determineWinner(
+    answerData,
+    compareData,
+    yourCityText,
+    compareCityText
+  ) {
+    // parseFloat(answerData) > parseFloat(compareData)
+    //   ? yourCityText.addClass("ct-win")
+    //   : compareCityText.addClass("ct-win");
+    if (parseFloat(answerData) > parseFloat(compareData)) {
+      yourCityText.addClass("ct-win");
+    } else if (parseFloat(answerData) < parseFloat(compareData)) {
+      compareCityText.addClass("ct-win");
+    } else return;
+  }
+
+  function updateQuestionOne() {
+    const yourCityText = $("#your-city-smart-city");
+    const compareCityText = $("#compare-city-smart-city");
+    const answerData = comparisonToolData.q1;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q1;
+    let answerDataText;
+    let compareDataText;
+
+    if (isJapanVersion) {
+      answerDataText = ctLegend.jp.q1[answerData];
+      compareDataText = ctLegend.jp.q1[compareData];
+    } else {
+      answerDataText = ctLegend.en.q1[answerData];
+      compareDataText = ctLegend.en.q1[compareData];
+    }
+
+    yourCityText.text(answerDataText);
+    compareCityText.text(compareDataText);
+
+    console.log(answerDataText);
+    console.log(compareDataText);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+
+  function updateQuestionTwo() {
+    const yourCityText = $("#your-city-internet-access");
+    const compareCityText = $("#compare-city-internet-access");
+    const answerData = comparisonToolData.q2;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q2;
+
+    yourCityText.text(answerData);
+    compareCityText.text(compareData);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+
+  function updateQuestionThree() {
+    const yourCityText = $("#your-city-doctors");
+    const compareCityText = $("#compare-city-doctors");
+    const answerData = comparisonToolData.q3;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q3;
+
+    yourCityText.text(answerData);
+    compareCityText.text(compareData);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+
+  function updateQuestionFour() {
+    const yourCityText = $("#your-city-life-expectancy");
+    const compareCityText = $("#compare-city-life-expectancy");
+    const answerData = comparisonToolData.q4;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q4;
+
+    yourCityText.text(answerData);
+    compareCityText.text(compareData);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+
+  function updateQuestionFive() {
+    const yourCityText = $("#your-city-mortality");
+    const compareCityText = $("#compare-city-mortality");
+    const answerData = comparisonToolData.q5;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q5;
+
+    yourCityText.text(answerData);
+    compareCityText.text(compareData);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+
+  function updateQuestionSix() {
+    const yourCityText = $("#your-city-disaster-management");
+    const compareCityText = $("#compare-city-disaster-management");
+    const answerData = comparisonToolData.q6;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q6;
+    let answerDataText;
+    let compareDataText;
+
+    if (isJapanVersion) {
+      answerDataText = ctLegend.jp.q6[answerData];
+      compareDataText = ctLegend.jp.q6[compareData];
+    } else {
+      answerDataText = ctLegend.en.q6[answerData];
+      compareDataText = ctLegend.en.q6[compareData];
+    }
+
+    yourCityText.text(answerDataText);
+    compareCityText.text(compareDataText);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+  function updateQuestionSeven() {
+    const yourCityText = $("#your-city-disaster-risk");
+    const compareCityText = $("#compare-city-disaster-risk");
+    const answerData = comparisonToolData.q7;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q7;
+    let answerDataText;
+    let compareDataText;
+
+    if (isJapanVersion) {
+      answerDataText = ctLegend.jp.q7[answerData];
+      compareDataText = ctLegend.jp.q7[compareData];
+    } else {
+      answerDataText = ctLegend.en.q7[answerData];
+      compareDataText = ctLegend.en.q7[compareData];
+    }
+
+    yourCityText.text(answerDataText);
+    compareCityText.text(compareDataText);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+  function updateQuestionEight() {
+    const yourCityText = $("#your-city-gdp");
+    const compareCityText = $("#compare-city-gdp");
+    const answerData = comparisonToolData.q8;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q8;
+
+    yourCityText.text(answerData);
+    compareCityText.text(compareData);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+  function updateQuestionNine() {
+    const yourCityText = $("#your-city-crimes");
+    const compareCityText = $("#compare-city-crimes");
+    const answerData = comparisonToolData.q9;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q9;
+    let answerDataText;
+    let compareDataText;
+
+    if (isJapanVersion) {
+      answerDataText = ctLegend.jp.q9[answerData];
+      compareDataText = ctLegend.jp.q9[compareData];
+    } else {
+      answerDataText = ctLegend.en.q9[answerData];
+      compareDataText = ctLegend.en.q9[compareData];
+    }
+
+    yourCityText.text(answerDataText);
+    compareCityText.text(compareDataText);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+  function updateQuestionTen() {
+    const yourCityText = $("#your-city-masterplan");
+    const compareCityText = $("#compare-city-masterplan");
+    const answerData = comparisonToolData.q10;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q10;
+    let answerDataText;
+    let compareDataText;
+
+    if (isJapanVersion) {
+      answerDataText = ctLegend.jp.q10[answerData];
+      compareDataText = ctLegend.jp.q10[compareData];
+    } else {
+      answerDataText = ctLegend.en.q10[answerData];
+      compareDataText = ctLegend.en.q10[compareData];
+    }
+
+    yourCityText.text(answerDataText);
+    compareCityText.text(compareDataText);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+  function updateQuestionEleven() {
+    const yourCityText = $("#your-city-air-quality");
+    const compareCityText = $("#compare-city-air-quality");
+    const answerData = comparisonToolData.q11;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q11;
+    let answerDataText;
+    let compareDataText;
+
+    if (isJapanVersion) {
+      answerDataText = ctLegend.jp.q11[answerData];
+      compareDataText = ctLegend.jp.q11[compareData];
+    } else {
+      answerDataText = ctLegend.en.q11[answerData];
+      compareDataText = ctLegend.en.q11[compareData];
+    }
+
+    yourCityText.text(answerDataText);
+    compareCityText.text(compareDataText);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+  function updateQuestionTwelve() {
+    const yourCityText = $("#your-city-tree-cover");
+    const compareCityText = $("#compare-city-tree-cover");
+    const answerData = comparisonToolData.q12;
+    const compareData = JSON.parse(localStorage.getItem("compareCityData")).q12;
+
+    yourCityText.text(answerData);
+    compareCityText.text(compareData);
+
+    determineWinner(answerData, compareData, yourCityText, compareCityText);
+  }
+}
+
+function resetForm() {
+  const formSection = $(".ct-section-form");
+  const radioButtons = $(".ct-radio input");
+  const nextButtons = $(".ct-section-questions .ct-btn");
+  const inputFields = $(".ct-field");
+  const yourCityField = $(".ct-field-your-city");
+  const currentCity = comparisonToolData.yourCity;
+
+  console.log(nextButtons);
+
+  ctForm.css({
+    display: "block",
+    opacity: "1",
+    "pointer-events": "auto",
+  });
+  ctResults.removeClass("active");
+  formSection.addClass("active");
+
+  //resets form values
+  $(radioButtons).each(function () {
+    $(this).prop("checked", false);
+  });
+
+  $(inputFields).each(function () {
+    $(this).val("");
+  });
+
+  //disable ct-btn
+  $(nextButtons).each(function () {
+    $(this).addClass("ct-disabled");
+  });
+
+  //saves autoFill "your city"
+  yourCityField.val(currentCity);
+
+  resetStepper();
+  $(".ct-barometer-arrow").removeClass("animate");
+  TweenMax.set(".ct-results.animated .animated-child", { y: 25, opacity: 0 });
+}
+
+function resetStepper() {
+  const steps = $(".ct-step");
+  const firstStep = steps[0];
+
+  $(steps).each(function () {
+    $(this).removeClass("is-done active");
+  });
+
+  $(firstStep).addClass("active");
+}

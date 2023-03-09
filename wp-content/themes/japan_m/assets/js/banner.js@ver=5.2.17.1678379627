@@ -1,0 +1,33 @@
+// (function (app) {
+//   "use strict";
+
+//   var Banner = function () {};
+//   const banner = $(".banner");
+//   const closeButton = $(".banner__close");
+//   const sectionLayer = $(".section-layer");
+
+//   Banner.prototype.init = function () {
+//     console.log(banner);
+//     setTimeout(function () {
+//       banner.fadeIn();
+//     }, 3500);
+
+//     sectionLayer.on("click", function () {
+//       console.log("click outside");
+//       const isBannerOpen = $(".banner.active").length > 0;
+
+//       if (isBannerOpen) {
+//         banner.fadeOut().removeClass("active");
+//       }
+//     });
+
+//     closeButton.on("click", function () {
+//       banner.fadeOut().removeClass("active");
+//     });
+//   };
+
+//   app.onLoad(function () {
+//     console.log("banner init");
+//     Banner.prototype.init();
+//   });
+// })(window.app);

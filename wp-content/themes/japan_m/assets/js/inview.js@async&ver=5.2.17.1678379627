@@ -1,0 +1,34 @@
+(function(app) {
+    'use strict';
+
+    var InView = function() {};
+
+    InView.prototype.init = function() {
+        var _self = this;
+        // _self.footerReached();
+    };
+    InView.prototype.footerReached = function() {
+        $('.section-last').scroll(function() {
+            $('#section-footer').one('inview', function(event, isInView) {
+                if (isInView) {
+                    TweenMax.to(($('.content__footer')), 0.7, { delay: .4, y: $('.content__footer .wrapper__nec-logo').height(), ease: Expo.easeOut }, 0)
+                    TweenMax.to(($('.btn__navigate-to-top')), 0.3, { delay: .4, opacity: 1, scale: 1, transformOrigin: 'center' }, 0);
+                } else {
+                    TweenMax.to(($('.content__footer')), 0.7, { delay: .4, y: 0, ease: Expo.easeOut })
+                    TweenMax.to($('.btn__navigate-to-top'), 0.3, { delay: .4, opacity: 0, scale: 0, transformOrigin: 'center' });
+                }
+            });
+        })
+
+    }
+
+
+
+    app.InView = InView;
+
+    app.ready(function() {
+        // console.log('InView Ready');
+        InView.prototype.init()
+    })
+
+})(window.app);

@@ -1,0 +1,12 @@
+var path = 'assets/img/'
+var preloadImages = [
+    path+'transition-canvas/City_atlas_.png',
+    path +'transition-canvas/city.jpg',
+    path +'transition-canvas/layer2.png',
+    path +'transition-canvas/layer3.png',
+    path +'transition-canvas/layer4.png',
+    path +'transition-canvas/layer5.png',
+    path +'transition-canvas/bridge1.png',
+    path +'transition-canvas/bridge2.png',
+    path +'transition-canvas/bridge3.png',
+]

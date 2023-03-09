@@ -1,0 +1,54 @@
+(function(app) {
+    'use strict';
+
+    var Isotope = function() {};
+
+
+    Isotope.prototype.init = function() {
+        var _self = this;
+        _self.filter()
+        _self.gridSectionActive()
+
+        $('.grid').isotope({
+            layoutMode: 'fitRows',
+            itemSelector: '.grid-item',
+            fitRows: {
+                gutter: '.gutter-sizer'
+            }
+
+        });
+    };
+
+    Isotope.prototype.filter = function() {
+        // console.log("filter")
+        var $grid = $('.grid')
+        var filterFns = {};
+        $('.filter-wrapper, .filter').on('click', function(e) {
+            e.preventDefault();
+            var filterValue = $(this).attr('data-filter');
+            filterValue = filterFns[filterValue] || filterValue;
+            $grid.isotope({ filter: filterValue });
+            $(this).addClass('is--active').siblings().removeClass('is--active')
+        });
+    }
+
+    Isotope.prototype.gridSectionActive = function() {
+
+        $(document).ready(function() {
+            if ($('.section__grid').css('opacity') == 1) {
+                $('html, body').removeClass('disable-scroll');
+                $('.section').css('overflow', 'scroll')
+            } else {
+                $('html, body').addClass('disable-scroll');
+            }
+        })
+    }
+
+    app.Isotope = Isotope;
+
+    app.ready(function() {
+        // console.log('isotope ready')
+        Isotope.prototype.init()
+    })
+
+})(window.app);

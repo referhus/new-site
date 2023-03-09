@@ -1,0 +1,1844 @@
+const comparisonScale = {
+  secureSmartCities: {
+    0: ["caracas"],
+    1: [
+      "amsterdam",
+      "baku",
+      "barcelona",
+      "beijing",
+      "bogota",
+      "brussels",
+      "buenos aires",
+      "cairo",
+      "casablanca",
+      "chicago",
+      "dallas",
+      "dhaka",
+      "ho chi minh city",
+      "hong kong",
+      "istanbul",
+      "jakarta",
+      "johannesburg",
+      "karachi",
+      "kuala lumpur",
+      "kuwait city",
+      "lagos",
+      "lisbon",
+      "madrid",
+      "manila",
+      "melbourne",
+      "milan",
+      "mumbai",
+      "new delhi",
+      "osaka",
+      "paris",
+      "quito",
+      "rio de janeiro",
+      "riyadh",
+      "rome",
+      "santiago",
+      "sao paulo",
+      "seoul",
+      "stockholm",
+      "tokyo",
+      "toronto",
+      "washington dc",
+      "wellington",
+      "yangon",
+      "zurich",
+    ],
+    2: [
+      "abu dhabi",
+      "bangkok",
+      "copenhagen",
+      "dubai",
+      "frankfurt",
+      "london",
+      "los angeles",
+      "mexico city",
+      "moscow",
+      "new york",
+      "san francisco",
+      "shanghai",
+      "singapore",
+      "sydney",
+      "taipei",
+    ],
+  },
+  disasterManagement: {
+    1: ["baku", "cairo", "caracas", "lagos", "manila"],
+    2: [
+      "bangkok",
+      "bogota",
+      "casablanca",
+      "dhaka",
+      "ho chi minh city",
+      "jakarta",
+      "johannesburg",
+      "karachi",
+      "kuwait city",
+      "mexico city",
+      "quito",
+      "rio de janeiro",
+      "riyadh",
+      "santiago",
+      "sao paulo",
+      "yangon",
+    ],
+    3: [
+      "abu dhabi",
+      "buenos aires",
+      "dubai",
+      "istanbul",
+      "kuala lumpur",
+      "lisbon",
+      "moscow",
+      "mumbai",
+      "new delhi",
+    ],
+    4: [
+      "amsterdam",
+      "barcelona",
+      "beijing",
+      "brussels",
+      "chicago",
+      "copenhagen",
+      "dallas",
+      "frankfurt",
+      "hong kong",
+      "london",
+      "los angeles",
+      "madrid",
+      "melbourne",
+      "milan",
+      "new york",
+      "osaka",
+      "paris",
+      "rome",
+      "san francisco",
+      "seoul",
+      "shanghai",
+      "singapore",
+      "stockholm",
+      "sydney",
+      "taipei",
+      "tokyo",
+      "toronto",
+      "washington dc",
+      "wellington",
+      "zurich",
+    ],
+  },
+  disasterRisk: {
+    0: ["baku", "bogota", "caracas", "lagos", "yangon"],
+    1: [
+      "abu dhabi",
+      "bangkok",
+      "buenos aires",
+      "cairo",
+      "casablanca",
+      "dhaka",
+      "dubai",
+      "ho chi minh city",
+      "istanbul",
+      "jakarta",
+      "johannesburg",
+      "karachi",
+      "kuala lumpur",
+      "kuwait city",
+      "manila",
+      "mexico city",
+      "milan",
+      "moscow",
+      "mumbai",
+      "new delhi",
+      "paris",
+      "quito",
+      "rio de janeiro",
+      "riyadh",
+      "rome",
+      "santiago",
+      "sao paulo",
+      "stockholm",
+      "zurich",
+    ],
+    2: [
+      "amsterdam",
+      "barcelona",
+      "beijing",
+      "brussels",
+      "chicago",
+      "copenhagen",
+      "dallas",
+      "frankfurt",
+      "hong kong",
+      "lisbon",
+      "london",
+      "los angeles",
+      "madrid",
+      "melbourne",
+      "new york",
+      "osaka",
+      "san francisco",
+      "seoul",
+      "shanghai",
+      "singapore",
+      "sydney",
+      "taipei",
+      "tokyo",
+      "toronto",
+      "washington dc",
+      "wellington",
+    ],
+  },
+  crimes: {
+    0: ["caracas", "lagos", "mexico city"],
+    1: [
+      "bogota",
+      "johannesburg",
+      "karachi",
+      "quito",
+      "rio de janeiro",
+      "sao paulo",
+    ],
+    2: ["baku", "buenos aires", "dhaka", "istanbul", "new delhi"],
+    3: [
+      "bangkok",
+      "beijing",
+      "brussels",
+      "cairo",
+      "casablanca",
+      "chicago",
+      "dallas",
+      "frankfurt",
+      "ho chi minh city",
+      "jakarta",
+      "kuala lumpur",
+      "lisbon",
+      "london",
+      "los angeles",
+      "madrid",
+      "manila",
+      "milan",
+      "moscow",
+      "mumbai",
+      "new york",
+      "rome",
+      "san francisco",
+      "santiago",
+      "washington dc",
+      "yangon",
+    ],
+    4: [
+      "abu dhabi",
+      "amsterdam",
+      "barcelona",
+      "copenhagen",
+      "dubai",
+      "hong kong",
+      "kuwait city",
+      "melbourne",
+      "osaka",
+      "paris",
+      "riyadh",
+      "seoul",
+      "shanghai",
+      "singapore",
+      "stockholm",
+      "sydney",
+      "taipei",
+      "tokyo",
+      "toronto",
+      "wellington",
+      "zurich",
+    ],
+  },
+  masterplan: {
+    0: ["casablanca", "dhaka", "karachi", "kuwait city", "moscow"],
+    1: [
+      "bangkok",
+      "beijing",
+      "cairo",
+      "caracas",
+      "dubai",
+      "ho chi minh city",
+      "istanbul",
+      "lagos",
+      "manila",
+      "mumbai",
+      "new delhi",
+      "quito",
+      "yangon",
+    ],
+    2: [
+      "abu dhabi",
+      "amsterdam",
+      "baku",
+      "barcelona",
+      "bogota",
+      "brussels",
+      "buenos aires",
+      "chicago",
+      "copenhagen",
+      "dallas",
+      "frankfurt",
+      "hong kong",
+      "jakarta",
+      "johannesburg",
+      "kuala lumpur",
+      "lisbon",
+      "london",
+      "los angeles",
+      "madrid",
+      "melbourne",
+      "mexico city",
+      "milan",
+      "new york",
+      "osaka",
+      "paris",
+      "rio de janeiro",
+      "riyadh",
+      "rome",
+      "san francisco",
+      "santiago",
+      "sao paulo",
+      "seoul",
+      "shanghai",
+      "singapore",
+      "stockholm",
+      "sydney",
+      "taipei",
+      "tokyo",
+      "toronto",
+      "washington dc",
+      "wellington",
+      "zurich",
+    ],
+  },
+  airQuality: {
+    0: ["baku", "dhaka", "new delhi"],
+    1: [
+      "abu dhabi",
+      "beijing",
+      "dubai",
+      "jakarta",
+      "karachi",
+      "kuwait city",
+      "mumbai",
+      "shanghai",
+    ],
+    2: [
+      "casablanca",
+      "ho chi minh city",
+      "johannesburg",
+      "lagos",
+      "santiago",
+      "yangon",
+    ],
+    3: [
+      "amsterdam",
+      "bangkok",
+      "barcelona",
+      "bogota",
+      "brussels",
+      "buenos aires",
+      "cairo",
+      "caracas",
+      "chicago",
+      "frankfurt",
+      "hong kong",
+      "istanbul",
+      "kuala lumpur",
+      "london",
+      "los angeles",
+      "manila",
+      "mexico city",
+      "milan",
+      "new york",
+      "osaka",
+      "paris",
+      "rio de janeiro",
+      "riyadh",
+      "rome",
+      "sao paulo",
+      "seoul",
+      "singapore",
+      "sydney",
+      "taipei",
+      "tokyo",
+      "zurich",
+    ],
+    4: [
+      "copenhagen",
+      "dallas",
+      "lisbon",
+      "madrid",
+      "melbourne",
+      "moscow",
+      "quito",
+      "san francisco",
+      "stockholm",
+      "toronto",
+      "washington dc",
+      "wellington",
+    ],
+  },
+};
+
+const internetAccess = [
+  {
+    city: "kuwait city",
+    data: "99.50",
+  },
+  {
+    city: "abu dhabi",
+    data: "99.20",
+  },
+  {
+    city: "dubai",
+    data: "99.20",
+  },
+  {
+    city: "copenhagen",
+    data: "96.60",
+  },
+  {
+    city: "seoul",
+    data: "96.00",
+  },
+  {
+    city: "riyadh",
+    data: "95.70",
+  },
+  {
+    city: "london",
+    data: "94.80",
+  },
+  {
+    city: "stockholm",
+    data: "94.50",
+  },
+  {
+    city: "amsterdam",
+    data: "93.30",
+  },
+  {
+    city: "zurich",
+    data: "93.20",
+  },
+  {
+    city: "tokyo",
+    data: "92.73",
+  },
+  {
+    city: "hong kong",
+    data: "91.74",
+  },
+  {
+    city: "toronto",
+    data: "91.00",
+  },
+  {
+    city: "wellington",
+    data: "91.00",
+  },
+  {
+    city: "barcelona",
+    data: "90.70",
+  },
+  {
+    city: "istanbul",
+    data: "90.70",
+  },
+  {
+    city: "madrid",
+    data: "90.70",
+  },
+  {
+    city: "milan",
+    data: "90.60",
+  },
+  {
+    city: "rome",
+    data: "90.60",
+  },
+  {
+    city: "brussels",
+    data: "90.30",
+  },
+  {
+    city: "paris",
+    data: "89.00",
+  },
+  {
+    city: "singapore",
+    data: "89.00",
+  },
+  {
+    city: "taipei",
+    data: "88.82",
+  },
+  {
+    city: "frankfurt",
+    data: "88.10",
+  },
+  {
+    city: "washington dc",
+    data: "87.30",
+  },
+  {
+    city: "los angeles",
+    data: "86.70",
+  },
+  {
+    city: "san francisco",
+    data: "86.70",
+  },
+  {
+    city: "kuala lumpur",
+    data: "84.20",
+  },
+  {
+    city: "chicago",
+    data: "83.80",
+  },
+  {
+    city: "osaka",
+    data: "83.00",
+  },
+  {
+    city: "buenos aires",
+    data: "82.90",
+  },
+  {
+    city: "new york",
+    data: "82.80",
+  },
+  {
+    city: "moscow",
+    data: "82.64",
+  },
+  {
+    city: "santiago",
+    data: "82.00",
+  },
+  {
+    city: "dallas",
+    data: "81.90",
+  },
+  {
+    city: "baku",
+    data: "81.10",
+  },
+  {
+    city: "melbourne",
+    data: "76.20",
+  },
+  {
+    city: "lisbon",
+    data: "75.40",
+  },
+  {
+    city: "sydney",
+    data: "75.20",
+  },
+  {
+    city: "casablanca",
+    data: "74.38",
+  },
+  {
+    city: "rio de janeiro",
+    data: "73.90",
+  },
+  {
+    city: "sao paulo",
+    data: "73.90",
+  },
+  {
+    city: "caracas",
+    data: "72.00",
+  },
+  {
+    city: "mexico city",
+    data: "70.07",
+  },
+  {
+    city: "ho chi minh city",
+    data: "68.70",
+  },
+  {
+    city: "new delhi",
+    data: "68.00",
+  },
+  {
+    city: "bangkok",
+    data: "66.70",
+  },
+  {
+    city: "bogota",
+    data: "65.00",
+  },
+  {
+    city: "johannesburg",
+    data: "64.70",
+  },
+  {
+    city: "beijing",
+    data: "64.57",
+  },
+  {
+    city: "shanghai",
+    data: "64.57",
+  },
+  {
+    city: "manila",
+    data: "64.00",
+  },
+  {
+    city: "cairo",
+    data: "57.30",
+  },
+  {
+    city: "quito",
+    data: "57.00",
+  },
+  {
+    city: "mumbai",
+    data: "50.00",
+  },
+  {
+    city: "jakarta",
+    data: "47.70",
+  },
+  {
+    city: "lagos",
+    data: "42.00",
+  },
+  {
+    city: "yangon",
+    data: "31.00",
+  },
+  {
+    city: "karachi",
+    data: "17.07",
+  },
+  {
+    city: "dhaka",
+    data: "12.90",
+  },
+];
+
+const noOfDoctorsPer1000 = [
+  {
+    city: "washington dc",
+    data: "8.47",
+  },
+  {
+    city: "barcelona",
+    data: "4.83",
+  },
+  {
+    city: "stockholm",
+    data: "4.71",
+  },
+  {
+    city: "lisbon",
+    data: "4.43",
+  },
+  {
+    city: "frankfurt",
+    data: "4.30",
+  },
+  {
+    city: "zurich",
+    data: "4.30",
+  },
+  {
+    city: "moscow",
+    data: "4.26",
+  },
+  {
+    city: "abu dhabi",
+    data: "4.00",
+  },
+  {
+    city: "buenos aires",
+    data: "4.00",
+  },
+  {
+    city: "copenhagen",
+    data: "4.00",
+  },
+  {
+    city: "milan",
+    data: "4.00",
+  },
+  {
+    city: "rome",
+    data: "4.00",
+  },
+  {
+    city: "new york",
+    data: "3.75",
+  },
+  {
+    city: "melbourne",
+    data: "3.68",
+  },
+  {
+    city: "sydney",
+    data: "3.68",
+  },
+  {
+    city: "amsterdam",
+    data: "3.60",
+  },
+  {
+    city: "madrid",
+    data: "3.60",
+  },
+  {
+    city: "wellington",
+    data: "3.60",
+  },
+  {
+    city: "beijing",
+    data: "3.55",
+  },
+  {
+    city: "dubai",
+    data: "3.48",
+  },
+  {
+    city: "tokyo",
+    data: "3.28",
+  },
+  {
+    city: "paris",
+    data: "3.26",
+  },
+  {
+    city: "baku",
+    data: "3.20",
+  },
+  {
+    city: "london",
+    data: "3.00",
+  },
+  {
+    city: "new delhi",
+    data: "3.00",
+  },
+  {
+    city: "kuala lumpur",
+    data: "2.99",
+  },
+  {
+    city: "shanghai",
+    data: "2.96",
+  },
+  {
+    city: "osaka",
+    data: "2.90",
+  },
+  {
+    city: "chicago",
+    data: "2.84",
+  },
+  {
+    city: "los angeles",
+    data: "2.79",
+  },
+  {
+    city: "san francisco",
+    data: "2.79",
+  },
+  {
+    city: "santiago",
+    data: "2.60",
+  },
+  {
+    city: "kuwait city",
+    data: "2.50",
+  },
+  {
+    city: "singapore",
+    data: "2.50",
+  },
+  {
+    city: "toronto",
+    data: "2.41",
+  },
+  {
+    city: "mexico city",
+    data: "2.40",
+  },
+  {
+    city: "seoul",
+    data: "2.34",
+  },
+  {
+    city: "taipei",
+    data: "2.30",
+  },
+  {
+    city: "bangkok",
+    data: "2.28",
+  },
+  {
+    city: "dallas",
+    data: "2.24",
+  },
+  {
+    city: "bogota",
+    data: "2.20",
+  },
+  {
+    city: "rio de janeiro",
+    data: "2.20",
+  },
+  {
+    city: "sao paulo",
+    data: "2.20",
+  },
+  {
+    city: "brussels",
+    data: "2.01",
+  },
+  {
+    city: "quito",
+    data: "2.0",
+  },
+  {
+    city: "hong kong",
+    data: "1.95",
+  },
+  {
+    city: "caracas",
+    data: "1.90",
+  },
+  {
+    city: "istanbul",
+    data: "1.77",
+  },
+  {
+    city: "riyadh",
+    data: "1.28",
+  },
+  {
+    city: "johannesburg",
+    data: "0.91",
+  },
+  {
+    city: "ho chi minh city",
+    data: "0.86",
+  },
+  {
+    city: "casablanca",
+    data: "0.70",
+  },
+  {
+    city: "yangon",
+    data: "0.70",
+  },
+  {
+    city: "dhaka",
+    data: "0.58",
+  },
+  {
+    city: "mumbai",
+    data: "0.54",
+  },
+  {
+    city: "cairo",
+    data: "0.45",
+  },
+  {
+    city: "manila",
+    data: "0.39",
+  },
+  {
+    city: "lagos",
+    data: "0.38",
+  },
+  {
+    city: "karachi",
+    data: "0.36",
+  },
+  {
+    city: "jakarta",
+    data: "0.05",
+  },
+];
+
+const lifeExpentancyYears = [
+  {
+    city: "hong kong",
+    data: "85",
+  },
+  {
+    city: "madrid",
+    data: "84.99",
+  },
+  {
+    city: "paris",
+    data: "84.50",
+  },
+  {
+    city: "tokyo",
+    data: "84.16",
+  },
+  {
+    city: "seoul",
+    data: "84.10",
+  },
+  {
+    city: "barcelona",
+    data: "83.90",
+  },
+  {
+    city: "taipei",
+    data: "83.90",
+  },
+  {
+    city: "san francisco",
+    data: "83.80",
+  },
+  {
+    city: "stockholm",
+    data: "83.70",
+  },
+  {
+    city: "shanghai",
+    data: "83.66",
+  },
+  {
+    city: "melbourne",
+    data: "83.65",
+  },
+  {
+    city: "singapore",
+    data: "83.60",
+  },
+  {
+    city: "osaka",
+    data: "83.48",
+  },
+  {
+    city: "zurich",
+    data: "83.35",
+  },
+  {
+    city: "sydney",
+    data: "82.85",
+  },
+  {
+    city: "london",
+    data: "82.80",
+  },
+  {
+    city: "wellington",
+    data: "82.43",
+  },
+  {
+    city: "amsterdam",
+    data: "82.42",
+  },
+  {
+    city: "toronto",
+    data: "82.40",
+  },
+  {
+    city: "beijing",
+    data: "82.31",
+  },
+  {
+    city: "milan",
+    data: "82.15",
+  },
+  {
+    city: "dubai",
+    data: "82.10",
+  },
+  {
+    city: "los angeles",
+    data: "82.10",
+  },
+  {
+    city: "frankfurt",
+    data: "81.63",
+  },
+  {
+    city: "brussels",
+    data: "81.60",
+  },
+  {
+    city: "rome",
+    data: "81.57",
+  },
+  {
+    city: "copenhagen",
+    data: "81.30",
+  },
+  {
+    city: "new york",
+    data: "81.30",
+  },
+  {
+    city: "lisbon",
+    data: "81.01",
+  },
+  {
+    city: "santiago",
+    data: "79.40",
+  },
+  {
+    city: "dallas",
+    data: "78.90",
+  },
+  {
+    city: "abu dhabi",
+    data: "78.75",
+  },
+  {
+    city: "istanbul",
+    data: "78.60",
+  },
+  {
+    city: "moscow",
+    data: "78.40",
+  },
+  {
+    city: "bogota",
+    data: "78.39",
+  },
+  {
+    city: "washington dc",
+    data: "78.00",
+  },
+  {
+    city: "chicago",
+    data: "77.40",
+  },
+  {
+    city: "bangkok",
+    data: "77.34",
+  },
+  {
+    city: "quito",
+    data: "77.22",
+  },
+  {
+    city: "kuala lumpur",
+    data: "76.95",
+  },
+  {
+    city: "casablanca",
+    data: "76.90",
+  },
+  {
+    city: "mexico city",
+    data: "76.50",
+  },
+  {
+    city: "buenos aires",
+    data: "76.40",
+  },
+  {
+    city: "sao paulo",
+    data: "76.40",
+  },
+  {
+    city: "rio de janeiro",
+    data: "76.20",
+  },
+  {
+    city: "kuwait city",
+    data: "75.59",
+  },
+  {
+    city: "ho chi minh city",
+    data: "75.49",
+  },
+  {
+    city: "riyadh",
+    data: "75.00",
+  },
+  {
+    city: "new delhi",
+    data: "74.70",
+  },
+  {
+    city: "baku",
+    data: "73.12",
+  },
+  {
+    city: "dhaka",
+    data: "72.87",
+  },
+  {
+    city: "mumbai",
+    data: "72.50",
+  },
+  {
+    city: "cairo",
+    data: "72.15",
+  },
+  {
+    city: "caracas",
+    data: "72.07",
+  },
+  {
+    city: "jakarta",
+    data: "71.91",
+  },
+  {
+    city: "manila",
+    data: "71.36",
+  },
+  {
+    city: "karachi",
+    data: "67.43",
+  },
+  {
+    city: "yangon",
+    data: "67.36",
+  },
+  {
+    city: "johannesburg",
+    data: "64.38",
+  },
+  {
+    city: "lagos",
+    data: "55.02",
+  },
+];
+
+const mortalityRate = [
+  {
+    city: "ho chi minh city",
+    data: "0.03",
+  },
+  {
+    city: "taipei",
+    data: "0.04",
+  },
+  {
+    city: "bangkok",
+    data: "0.22",
+  },
+  {
+    city: "beijing",
+    data: "0.35",
+  },
+  {
+    city: "shanghai",
+    data: "0.35",
+  },
+  {
+    city: "wellington",
+    data: "0.48",
+  },
+  {
+    city: "singapore",
+    data: "0.49",
+  },
+  {
+    city: "sydney",
+    data: "0.66",
+  },
+  {
+    city: "seoul",
+    data: "1.63",
+  },
+  {
+    city: "lagos",
+    data: "2.57",
+  },
+  {
+    city: "hong kong",
+    data: "2.68",
+  },
+  {
+    city: "manila",
+    data: "2.90",
+  },
+  {
+    city: "kuala lumpur",
+    data: "3.66",
+  },
+  {
+    city: "tokyo",
+    data: "4.16",
+  },
+  {
+    city: "caracas",
+    data: "4.60",
+  },
+  {
+    city: "dhaka",
+    data: "5.16",
+  },
+  {
+    city: "yangon",
+    data: "5.88",
+  },
+  {
+    city: "san francisco",
+    data: "8.86",
+  },
+  {
+    city: "karachi",
+    data: "9.27",
+  },
+  {
+    city: "osaka",
+    data: "9.70",
+  },
+  {
+    city: "cairo",
+    data: "10.91",
+  },
+  {
+    city: "melbourne",
+    data: "12.63",
+  },
+  {
+    city: "buenos aires",
+    data: "12.66",
+  },
+  {
+    city: "abu dhabi",
+    data: "14.14",
+  },
+  {
+    city: "dubai",
+    data: "14.14",
+  },
+  {
+    city: "brussels",
+    data: "14.71",
+  },
+  {
+    city: "mexico city",
+    data: "17.43",
+  },
+  {
+    city: "jakarta",
+    data: "17.82",
+  },
+  {
+    city: "riyadh",
+    data: "18.66",
+  },
+  {
+    city: "casablanca",
+    data: "23.52",
+  },
+  {
+    city: "paris",
+    data: "26.36",
+  },
+  {
+    city: "kuwait city",
+    data: "26.72",
+  },
+  {
+    city: "baku",
+    data: "32.02",
+  },
+  {
+    city: "istanbul",
+    data: "34.50",
+  },
+  {
+    city: "mumbai",
+    data: "41.60",
+  },
+  {
+    city: "amsterdam",
+    data: "42.40",
+  },
+  {
+    city: "dallas",
+    data: "45.66",
+  },
+  {
+    city: "toronto",
+    data: "47.86",
+  },
+  {
+    city: "chicago",
+    data: "51.39",
+  },
+  {
+    city: "new delhi",
+    data: "55.73",
+  },
+  {
+    city: "johannesburg",
+    data: "63.50",
+  },
+  {
+    city: "washington dc",
+    data: "66.50",
+  },
+  {
+    city: "quito",
+    data: "72.52",
+  },
+  {
+    city: "frankfurt",
+    data: "95.15",
+  },
+  {
+    city: "copenhagen",
+    data: "101.31",
+  },
+  {
+    city: "rome",
+    data: "105.84",
+  },
+  {
+    city: "zurich",
+    data: "108.27",
+  },
+  {
+    city: "new york",
+    data: "120.13",
+  },
+  {
+    city: "moscow",
+    data: "124.68",
+  },
+  {
+    city: "london",
+    data: "133.48",
+  },
+  {
+    city: "barcelona",
+    data: "148.38",
+  },
+  {
+    city: "stockholm",
+    data: "156.46",
+  },
+  {
+    city: "los angeles",
+    data: "159.72",
+  },
+  {
+    city: "lisbon",
+    data: "160.58",
+  },
+  {
+    city: "santiago",
+    data: "170.96",
+  },
+  {
+    city: "bogota",
+    data: "180.60",
+  },
+  {
+    city: "madrid",
+    data: "220.67",
+  },
+  {
+    city: "milan",
+    data: "287.75",
+  },
+  {
+    city: "rio de janeiro",
+    data: "501.32",
+  },
+  {
+    city: "sao paulo",
+    data: "503.86",
+  },
+];
+
+const socialAssistance = [
+  {
+    city: "paris",
+    data: "31",
+  },
+  {
+    city: "brussels",
+    data: "29",
+  },
+  {
+    city: "copenhagen",
+    data: "28",
+  },
+  {
+    city: "milan",
+    data: "28",
+  },
+  {
+    city: "rome",
+    data: "28",
+  },
+  {
+    city: "frankfurt",
+    data: "26",
+  },
+  {
+    city: "stockholm",
+    data: "26",
+  },
+  {
+    city: "barcelona",
+    data: "25",
+  },
+  {
+    city: "madrid",
+    data: "25",
+  },
+  {
+    city: "lisbon",
+    data: "23",
+  },
+  {
+    city: "osaka",
+    data: "22",
+  },
+  {
+    city: "tokyo",
+    data: "22",
+  },
+  {
+    city: "london",
+    data: "21",
+  },
+  {
+    city: "chicago",
+    data: "19",
+  },
+  {
+    city: "dallas",
+    data: "19",
+  },
+  {
+    city: "los angeles",
+    data: "19",
+  },
+  {
+    city: "new york",
+    data: "19",
+  },
+  {
+    city: "san francisco",
+    data: "19",
+  },
+  {
+    city: "washington dc",
+    data: "19",
+  },
+  {
+    city: "wellington",
+    data: "19",
+  },
+  {
+    city: "toronto",
+    data: "18",
+  },
+  {
+    city: "melbourne",
+    data: "17",
+  },
+  {
+    city: "sydney",
+    data: "17",
+  },
+  {
+    city: "zurich",
+    data: "17",
+  },
+  {
+    city: "amsterdam",
+    data: "16",
+  },
+  {
+    city: "bogota",
+    data: "13",
+  },
+  {
+    city: "istanbul",
+    data: "12",
+  },
+  {
+    city: "seoul",
+    data: "12",
+  },
+  {
+    city: "kuwait city",
+    data: "11",
+  },
+  {
+    city: "santiago",
+    data: "11",
+  },
+  {
+    city: "taipei",
+    data: "11",
+  },
+  {
+    city: "caracas",
+    data: "9",
+  },
+  {
+    city: "mexico city",
+    data: "8",
+  },
+  {
+    city: "singapore",
+    data: "8",
+  },
+  {
+    city: "mumbai",
+    data: "7",
+  },
+  {
+    city: "new delhi",
+    data: "7",
+  },
+  {
+    city: "abu dhabi",
+    data: "5",
+  },
+  {
+    city: "dubai",
+    data: "5",
+  },
+  {
+    city: "bangkok",
+    data: "4",
+  },
+  {
+    city: "cairo",
+    data: "4",
+  },
+  {
+    city: "dhaka",
+    data: "3",
+  },
+  {
+    city: "hong kong",
+    data: "3",
+  },
+  {
+    city: "johannesburg",
+    data: "3",
+  },
+  {
+    city: "riyadh",
+    data: "3",
+  },
+  {
+    city: "buenos aires",
+    data: "2",
+  },
+  {
+    city: "ho chi minh city",
+    data: "2",
+  },
+  {
+    city: "moscow",
+    data: "2",
+  },
+  {
+    city: "rio de janeiro",
+    data: "2",
+  },
+  {
+    city: "sao paulo",
+    data: "2",
+  },
+  {
+    city: "baku",
+    data: "1",
+  },
+  {
+    city: "beijing",
+    data: "1",
+  },
+  {
+    city: "casablanca",
+    data: "1",
+  },
+  {
+    city: "jakarta",
+    data: "1",
+  },
+  {
+    city: "karachi",
+    data: "1",
+  },
+  {
+    city: "kuala lumpur",
+    data: "1",
+  },
+  {
+    city: "manila",
+    data: "1",
+  },
+  {
+    city: "quito",
+    data: "1",
+  },
+  {
+    city: "shanghai",
+    data: "1",
+  },
+  {
+    city: "lagos",
+    data: "0",
+  },
+  {
+    city: "yangon",
+    data: "0",
+  },
+];
+
+const treeCover = [
+  {
+    city: "hong kong",
+    data: "55.70",
+  },
+  {
+    city: "wellington",
+    data: "50.21",
+  },
+  {
+    city: "taipei",
+    data: "43.00",
+  },
+  {
+    city: "rio de janeiro",
+    data: "40.00",
+  },
+  {
+    city: "istanbul",
+    data: "37.00",
+  },
+  {
+    city: "barcelona",
+    data: "35.00",
+  },
+  {
+    city: "osaka",
+    data: "34.00",
+  },
+  {
+    city: "tokyo",
+    data: "33.00",
+  },
+  {
+    city: "rome",
+    data: "30.00",
+  },
+  {
+    city: "singapore",
+    data: "29.30",
+  },
+  {
+    city: "lagos",
+    data: "29.00",
+  },
+  {
+    city: "moscow",
+    data: "27.50",
+  },
+  {
+    city: "milan",
+    data: "27.00",
+  },
+  {
+    city: "sydney",
+    data: "25.90",
+  },
+  {
+    city: "mexico city",
+    data: "25.00",
+  },
+  {
+    city: "copenhagen",
+    data: "24.00",
+  },
+  {
+    city: "johannesburg",
+    data: "23.60",
+  },
+  {
+    city: "ho chi minh city",
+    data: "22.00",
+  },
+  {
+    city: "frankfurt",
+    data: "21.50",
+  },
+  {
+    city: "amsterdam",
+    data: "20.60",
+  },
+  {
+    city: "brussels",
+    data: "20.50",
+  },
+  {
+    city: "toronto",
+    data: "19.50",
+  },
+  {
+    city: "washington dc",
+    data: "18.00",
+  },
+  {
+    city: "los angeles",
+    data: "15.20",
+  },
+  {
+    city: "beijing",
+    data: "15.00",
+  },
+  {
+    city: "bogota",
+    data: "15.00",
+  },
+  {
+    city: "buenos aires",
+    data: "14.50",
+  },
+  {
+    city: "chicago",
+    data: "14.00",
+  },
+  {
+    city: "kuala lumpur",
+    data: "14.00",
+  },
+  {
+    city: "seoul",
+    data: "14.00",
+  },
+  {
+    city: "new york",
+    data: "13.50",
+  },
+  {
+    city: "santiago",
+    data: "13.00",
+  },
+  {
+    city: "london",
+    data: "12.70",
+  },
+  {
+    city: "dallas",
+    data: "12.10",
+  },
+  {
+    city: "madrid",
+    data: "12.00",
+  },
+  {
+    city: "yangon",
+    data: "12.00",
+  },
+  {
+    city: "sao paulo",
+    data: "11.70",
+  },
+  {
+    city: "lisbon",
+    data: "11.00",
+  },
+  {
+    city: "quito",
+    data: "10.80",
+  },
+  {
+    city: "san francisco",
+    data: "9.50",
+  },
+  {
+    city: "paris",
+    data: "8.80",
+  },
+  {
+    city: "dhaka",
+    data: "6.90",
+  },
+  {
+    city: "bangkok",
+    data: "5.00",
+  },
+  {
+    city: "melbourne",
+    data: "3.70",
+  },
+  {
+    city: "mumbai",
+    data: "3.00",
+  },
+  {
+    city: "shanghai",
+    data: "3.00",
+  },
+  {
+    city: "caracas",
+    data: "2.07",
+  },
+  {
+    city: "casablanca",
+    data: "2.00",
+  },
+  {
+    city: "jakarta",
+    data: "2.00",
+  },
+  {
+    city: "manila",
+    data: "0.70",
+  },
+  {
+    city: "stockholm",
+    data: "0.63",
+  },
+  {
+    city: "baku",
+    data: "0.40",
+  },
+  {
+    city: "zurich",
+    data: "0.36",
+  },
+  {
+    city: "new delhi",
+    data: "0.08",
+  },
+  {
+    city: "abu dhabi",
+    data: "0",
+  },
+  {
+    city: "cairo",
+    data: "0",
+  },
+  {
+    city: "dubai",
+    data: "0",
+  },
+  {
+    city: "karachi",
+    data: "0",
+  },
+  {
+    city: "kuwait city",
+    data: "0",
+  },
+  {
+    city: "riyadh",
+    data: "0",
+  },
+];

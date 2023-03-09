@@ -1,0 +1,35 @@
+$.ecojs.social = {
+  init: function () {
+    var _self = this
+    this.setSocialUrl()
+  },
+  setSocialUrl: function (item) {
+    var socialItem = $('.social-links li a')
+
+    var protocol = window.location.protocol.replace(':', '')
+
+    // var pinImage = $('.social-pinterest').attr('pin-image')
+
+
+    //https://twitter.com/share?url=http%3A%2F%2Feco.jtomice.dottylabs.com%2Ffeatured-article-1%2F&text=This%20is%20a%20title
+    //https://www.facebook.com/sharer/sharer.php?u=www.themeforest.net
+
+    var linkedinLink = 'https://www.linkedin.com/shareArticle?mini=true&url=' + protocol + '%3A//' + config.siteUrl
+    var twitterLink = 'https://twitter.com/share?url=' + protocol + '%3A//' + config.siteUrl
+    var fbLink = 'https://www.facebook.com/sharer/sharer.php?u=' + protocol + '%3A//' + config.siteUrl
+    var gplusLink = 'https://plus.google.com/share?url=' + protocol + '%3A//' + config.siteUrl
+    // var pinterestLink = 'https://www.pinterest.com/pin/create/button/?url=' + protocol + '%3A//' + config.siteUrl + '&media=' + pinImage + '&desc=""'
+    var emailLink = 'mailto:?&body=' + protocol + '%3A//' + config.siteUrl
+
+    $('.social-linkedin').attr('href', linkedinLink)
+    $('.social-twitter').attr('href', twitterLink)
+    $('.social-facebook').attr('href', fbLink)
+    $('.social-googleplus').attr('href', gplusLink)
+    // $('.social-pinterest').attr('href', pinterestLink)
+    $('.social-mail').attr('href', emailLink)
+
+    socialItem.each(function (index, value) {
+      var _this = $(value)
+    })
+  }
+}

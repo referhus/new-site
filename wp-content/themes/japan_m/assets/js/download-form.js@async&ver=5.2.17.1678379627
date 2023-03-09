@@ -1,0 +1,320 @@
+const nameField = $(".df-field-name");
+const emailField = $(".df-field-email");
+const jobTitleField = $(".df-field-job-title");
+const companyNameField = $(".df-field-company-name");
+const downloadForm = $(".download-form");
+const downloadFormButton = $(".ct-download");
+const checkboxText = $("#df-checkbox-jp");
+const privacyText = $("#df-privacy-policy");
+async function openDownloadForm() {
+  const userId = Cookies.get("userId");
+
+  const pdfCheckboxJp = `私はSafe Cities Indexホワイトペーパーをダウンロードすることにより、日本電気株式会社が私の個人情報を下記方針に基づいて取り扱うことに同意します。
+  <input name="terms" id="terms" type="checkbox" class="ct-field-terms df-terms">
+  <span class="ct-checkmark"></span>
+  `;
+  const pdfNoticeJp = `日本電気株式会社（以下、NECといいます）は、ご入力いただいたお客さまの個人情報を、下記のとおり取り扱います。 
+   
+  １．個人情報を取得する事業者および個人情報保護管理者
+  事業者：NEC
+  個人情報保護管理者：NEC　ＩＭＣ本部長（連絡先は第８項の問い合わせ先と同じ）
+
+  ２．個人情報の利用目的
+      a)　ソリューション提案に向けた活動（お客さまニーズの分析、商品・サービスの開発、評価収集・分析、提案活動等）
+      b)　本コンテンツをダウンロードされた方・利用者への各種情報の提供（E-mail）
+      c)　本コンテンツをダウンロードされた方・利用者のNEC ID登録
+          NEC IDご登録後は、セミナーやイベント、キャンペーン等へのお申込みが簡単に行える他、各種資料のダウンロード、メールマガジンによる情報提供等のサービスがご利用いただけます。
+          <a href="https://wisdom.nec.com/ja/policy.html" target="_blank">${"＜NEC ID利用規約： https://wisdom.nec.com/ja/policy.html＞"}</a> 
+  
+  ３．取得する個人情報の項目
+  会社名、氏名、メールアドレス、簡易診断ツール結果（本サービスをご利用の場合）
+
+  ４．個人情報の第三者提供
+  NECは、法令等に特段の定めがある場合を除き、第三者への個人情報の提供は行いません。
+   
+  ５．個人情報の取り扱いの委託
+  本コンテンツの利用およびダウンロードに際して、お客さまの個人情報の取り扱いをEconomist Intelligence Unit社（以下、EIU社）に委託します。このとき、お客さまの個人情報は、EIU社の所在地である英国および同社が保有する香港のサーバに移転されます。
+   
+  ６．個人情報の提供の任意性
+  お客さまから個人情報を提供いただくことにより、本コンテンツのご利用や、お問い合わせへの対応、お客さまへのサービスの提供等をいたしますが、個人情報の提供はお客さまの任意です。
+   
+  ７．安全管理措置
+  ご記入いただきましたお客様の個人情報は、漏えい、滅失、毀損を防止するための安全管理措置を施し、当社および委託先企業が運営するサーバで適切に管理させていただきます。
+  
+  ８．お客さまご自身の個人情報に関する照会、訂正、利用停止等については、お客さまご本人から下記問い合わせ先に別途ご連絡いただくことにより、対応いたします。
+  <a href="mailto:csg_sci@imc.jp.nec.com" target="_blank">お問い合わせ先：csg_sci@imc.jp.nec.com</a>
+   
+  ＜NECのプライバシーポリシーはこちら＞
+  NECの個人情報保護
+  <a href="https://jpn.nec.com/site/privacy/index.html" target="_blank">https://jpn.nec.com/site/privacy/index.html</a>`;
+  const pdfNoticeEn = `This privacy notice aims to give you information on how NEC Corporation collects and processes your personal data when you download or use the following contents.
+  - Safe Cities Index white paper
+  - Safe Cities Index data book
+  - Safe Cities Index city comparison tool
+
+  1. Controller of the Personal Data
+  (1) Company name : NEC Corporation (hereinafter referred to as "NEC")
+  (2) Contact details : General Manager, Integrated Marketing Communication Division, NEC Corporation to cont_strategy@imc.jp.nec.com　
+  (3) Postal address : 7-1, Shiba 5-chome, Minato-ku, Tokyo Japan 108-8001
+
+  2. Categories of the Personal Data
+  Personal data includes name, e-mail address, company name and a result of city comparison tool if you use.
+
+  3. Purposes of Processing for the Personal Data 
+  (1) To respond to inquiries.
+  (2) To respond to requests
+  (3) To introduce or relay information about companies (NEC Group Companies) that deal with NEC products, services, and solutions.
+  (4) To provide information or publicity materials about NEC products, services, and solutions.
+  (5) To provide information about events such as seminars and exhibitions.
+  (6) To contact customers.
+
+  4. Recipients of the Personal Data
+  NEC, NEC Group companies, their distributors and agents, NEC affiliates throughout the world, and companies that operate and manage NEC's inquiry site in Japan, upon the assurance that sufficient safety control measures have been established, which have concluded agreements concerning the processing of personal data, to provide services to their customers, within the scope of the stated purposes for using personal data. 
+
+  5. Overseas Transfer of the Personal Data
+  Economist Intelligence Unit manages and operates this website.
+  (1) Information transfer to a third country: Upon receipt of your inquiry, your personal data will be sent to Hong Kong & Japan.
+  (2) Question of adequate protection: The European Commission has recognized Japan as providing adequate protection of personal data.
+
+  6. Period for Which the Personal Data Will Be Stored
+  Personal data may be stored for as long as necessary to achieve the stated purpose for using it. 
+
+  7. Rights of the Data Subject
+  Under certain circumstances, you have the right with regard to the personal data which you provide as follows: 
+  - The right to request from the controller access to and rectification or erasure of personal data or restriction of processing concerning the data subject
+  - The right to object to processing concerning the data subject
+  - The right to data portability: The right to receive the personal data, which the data subject has provided to a data controller, in a structured, commonly used and machine-readable format, and to transmit those data to another data controller without hindrance from the controller to which the personal data have been provided (NEC)
+  - The right to withdraw consent at any time, without affecting the lawfulness of processing based on consent before its withdrawal
+  - The right to lodge a complaint with a supervisory authority, if it exists, in the country or region that the data object belongs
+
+  8. Statutory or Contractual Requirement Concerning the Provision of the Personal Data 
+  Provision of the personal data is not a statutory or contractual requirement, or a requirement necessary to enter into a contract, and you are not obliged to provide personal data. However, if you choose not to provide personal data, it may not be possible to respond to some inquiries. 
+
+  9. Non-existence of Decision-making Based Solely on Automated Processing
+  The access log for this website undergoes analysis, however, we do not make decisions that might affect you based solely on automated processing of the personal data that you provide, including profiling, in order to analyze or predict your likes and dislikes or personal behavior. 
+
+  10. Parental Consent
+  If you are under the age of 18, please make your participation in the survey ONLY AFTER obtaining consent given or authorized by the holder of parental responsibility over you.
+
+  11. Encrypted Communication
+  The survey form on this page uses encrypted communication via Secure Socket Layer (SSL) for personal data protection. 
+
+  12. Security of Processing the Personal Data
+  Recipients of the personal data implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk.`;
+  const workbookCheckboxJp = `私はSafe Cities Indexワークブックをダウンロードすることにより、日本電気株式会社が私の個人情報を下記方針に基づいて取り扱うことに同意します。
+  <input name="terms" id="terms" type="checkbox" class="ct-field-terms df-terms">
+  <span class="ct-checkmark"></span>
+  `;
+  const workbookNoticeJp = `日本電気株式会社（以下、NECといいます）は、ご入力いただいたお客さまの個人情報を、下記のとおり取り扱います。 
+   
+  １．個人情報を取得する事業者および個人情報保護管理者
+  事業者：NEC
+  個人情報保護管理者：NEC　ＩＭＣ本部長（連絡先は第８項の問い合わせ先と同じ）
+  
+  ２．個人情報の利用目的
+      a)　ソリューション提案に向けた活動（お客さまニーズの分析、商品・サービスの開発、評価収集・分析、提案活動等）
+      b)　本コンテンツをダウンロードされた方・利用者への各種情報の提供（E-mail）
+      c)　本コンテンツをダウンロードされた方・利用者のNEC ID登録
+          NEC IDご登録後は、セミナーやイベント、キャンペーン等へのお申込みが簡単に行える他、各種資料のダウンロード、メールマガジンによる情報提供等のサービスがご利用いただけます。
+          <a href="https://wisdom.nec.com/ja/policy.html" target="_blank">＜NEC ID利用規約： https://wisdom.nec.com/ja/policy.html＞</a>
+  
+  ３．取得する個人情報の項目
+  会社名、氏名、メールアドレス、簡易診断ツール結果（本サービスをご利用の場合）
+
+  ４．個人情報の第三者提供
+  NECは、法令等に特段の定めがある場合を除き、第三者への個人情報の提供は行いません。
+   
+  ５．個人情報の取り扱いの委託
+  本コンテンツの利用およびダウンロードに際して、お客さまの個人情報の取り扱いをEconomist Intelligence Unit社（以下、EIU社）に委託します。このとき、お客さまの個人情報は、EIU社の所在地である英国および同社が保有する香港のサーバに移転されます。
+   
+  ６．個人情報の提供の任意性
+  お客さまから個人情報を提供いただくことにより、本コンテンツのご利用や、お問い合わせへの対応、お客さまへのサービスの提供等をいたしますが、個人情報の提供はお客さまの任意です。
+   
+  ７．安全管理措置
+  ご記入いただきましたお客様の個人情報は、漏えい、滅失、毀損を防止するための安全管理措置を施し、当社および委託先企業が運営するサーバで適切に管理させていただきます。
+
+  ８．お客さまご自身の個人情報に関する照会、訂正、利用停止等については、お客さまご本人から下記問い合わせ先に別途ご連絡いただくことにより、対応いたします。
+  <a href="mailto:csg_sci@imc.jp.nec.com" target="_blank">お問い合わせ先：csg_sci@imc.jp.nec.com</a>
+   
+  ＜NECのプライバシーポリシーはこちら＞
+  NECの個人情報保護
+  <a href="https://jpn.nec.com/site/privacy/index.html" target="_blank">https://jpn.nec.com/site/privacy/index.html</a>
+  `;
+  const workbookNoticeEn = `This privacy notice aims to give you information on how NEC Corporation collects and processes your personal data when you download or use the following contents.
+  - Safe Cities Index white paper
+  - Safe Cities Index data book
+  - Safe Cities Index city comparison tool
+
+  1. Controller of the Personal Data
+  (1) Company name : NEC Corporation (hereinafter referred to as "NEC")
+  (2) Contact details : General Manager, Integrated Marketing Communication Division, NEC Corporation to cont_strategy@imc.jp.nec.com　
+  (3) Postal address : 7-1, Shiba 5-chome, Minato-ku, Tokyo Japan 108-8001
+
+  2. Categories of the Personal Data
+  Personal data includes name, e-mail address, company name and a result of city comparison tool if you use.
+
+  3. Purposes of Processing for the Personal Data 
+  (1) To respond to inquiries.
+  (2) To respond to requests
+  (3) To introduce or relay information about companies (NEC Group Companies) that deal with NEC products, services, and solutions.
+  (4) To provide information or publicity materials about NEC products, services, and solutions.
+  (5) To provide information about events such as seminars and exhibitions.
+  (6) To contact customers.
+
+  4. Recipients of the Personal Data
+  NEC, NEC Group companies, their distributors and agents, NEC affiliates throughout the world, and companies that operate and manage NEC's inquiry site in Japan, upon the assurance that sufficient safety control measures have been established, which have concluded agreements concerning the processing of personal data, to provide services to their customers, within the scope of the stated purposes for using personal data. 
+
+  5. Overseas Transfer of the Personal Data
+  Economist Intelligence Unit manages and operates this website.
+  (1) Information transfer to a third country: Upon receipt of your inquiry, your personal data will be sent to Hong Kong & Japan.
+  (2) Question of adequate protection: The European Commission has recognized Japan as providing adequate protection of personal data.
+
+  6. Period for Which the Personal Data Will Be Stored
+  Personal data may be stored for as long as necessary to achieve the stated purpose for using it. 
+
+  7. Rights of the Data Subject
+  Under certain circumstances, you have the right with regard to the personal data which you provide as follows: 
+  - The right to request from the controller access to and rectification or erasure of personal data or restriction of processing concerning the data subject
+  - The right to object to processing concerning the data subject
+  - The right to data portability: The right to receive the personal data, which the data subject has provided to a data controller, in a structured, commonly used and machine-readable format, and to transmit those data to another data controller without hindrance from the controller to which the personal data have been provided (NEC)
+  - The right to withdraw consent at any time, without affecting the lawfulness of processing based on consent before its withdrawal
+  - The right to lodge a complaint with a supervisory authority, if it exists, in the country or region that the data object belongs
+
+  8. Statutory or Contractual Requirement Concerning the Provision of the Personal Data 
+  Provision of the personal data is not a statutory or contractual requirement, or a requirement necessary to enter into a contract, and you are not obliged to provide personal data. However, if you choose not to provide personal data, it may not be possible to respond to some inquiries. 
+
+  9. Non-existence of Decision-making Based Solely on Automated Processing
+  The access log for this website undergoes analysis, however, we do not make decisions that might affect you based solely on automated processing of the personal data that you provide, including profiling, in order to analyze or predict your likes and dislikes or personal behavior. 
+
+  10. Parental Consent
+  If you are under the age of 18, please make your participation in the survey ONLY AFTER obtaining consent given or authorized by the holder of parental responsibility over you.
+
+  11. Encrypted Communication
+  The survey form on this page uses encrypted communication via Secure Socket Layer (SSL) for personal data protection. 
+
+  12. Security of Processing the Personal Data
+  Recipients of the personal data implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk.`;
+
+  console.log(userId);
+  userId && fetchUserData(userId);
+  // userId && populateFormData(userId);
+
+  if (downloadForm.attr("data-type") === "whitepaper") {
+    // downloadForm.hasClass("jp")
+    //   ? privacyText.html(pdfNoticeJp)
+    //   : privacyText.html(pdfNoticeEn);
+    if (downloadForm.hasClass("jp")) {
+      checkboxText.html(pdfCheckboxJp);
+      privacyText.html(pdfNoticeJp);
+    } else {
+      privacyText.html(pdfNoticeEn);
+    }
+  } else {
+    // downloadForm.hasClass("jp")
+    //   ? privacyText.html(workbookNoticeJp)
+    //   : privacyText.html(workbookNoticeEn);
+    if (downloadForm.hasClass("jp")) {
+      checkboxText.html(workbookCheckboxJp);
+      privacyText.html(workbookNoticeJp);
+    } else {
+      privacyText.html(workbookNoticeEn);
+    }
+  }
+}
+
+downloadFormButton.click(function (e) {
+  console.log("downloadFormButton");
+  e.preventDefault();
+  const workbookURL =
+    window.location.origin +
+    "/wp-content/uploads/2021/07/EIU_NEC_-Safe-Cities-Index-2021_Final-1.xlsm";
+  let file = $(this).attr("data-file");
+  const isJapanForm = $(".download-form.jp").length > 0;
+  const locale = isJapanForm ? "jp" : "en";
+
+  if (file === "#") {
+    file = workbookURL;
+  }
+
+  const userData = {
+    name: nameField.val(),
+    email: emailField.val(),
+    jobTitle: jobTitleField.val(),
+    companyName: companyNameField.val(),
+    downloadedFile: file,
+    locale,
+  };
+  saveDownloadToLocalDatabase(userData);
+  // saveDownloadFormToDatabase(file, userData);
+});
+
+function saveDownloadToLocalDatabase(userData) {
+  $.ajax({
+    type: "POST",
+    url: result.ajaxurl,
+    data: {
+      action: "save_download_form_results",
+      data: userData,
+    },
+    success: function (response) {
+      const uniqueId = response.data.ID;
+      const fileToDownload = userData.downloadedFile;
+
+      if (response.success) {
+        setCookie(uniqueId);
+      } else {
+        showError();
+      }
+
+      downloadFile(fileToDownload);
+    },
+  });
+}
+
+function downloadFile(file) {
+  const link = document.createElement("a");
+  const isJp = $(".download-form.jp").length > 0;
+
+  $(link).attr({
+    href: file,
+    download: "",
+    target: "_blank",
+  });
+
+  $(link).css("display", "none");
+  document.body.appendChild(link);
+
+  if (file.includes(".pdf")) {
+    if (isJp) {
+      ga("send", "event", "JP-Downloads", "Whitepaper", file);
+    } else {
+      ga("send", "event", "EN-Downloads", "Whitepaper", file);
+    }
+  } else {
+    if (isJp) {
+      ga("send", "event", "JP-Downloads", "Data-Workbook", file);
+    } else {
+      ga("send", "event", "EN-Downloads", "Data-Workbook", file);
+    }
+  }
+
+  console.log($(link));
+  link.click();
+  link.remove();
+
+  closePopup();
+}
+
+function closePopup() {
+  const dfModal = $(".download-form");
+  // const sectionLayer = $(".section-layer");
+
+  dfModal.fadeOut().removeClass("is-active");
+  // sectionLayer.css({ height: "100%", opacity: "1" });
+  // languageContainer.css("display", "flex");
+}
+
+function showError() {
+  console.log("error saving");
+  window.alert("Data was not saved. Please contact the administrator.");
+}
